@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     preset: "static",
     prerender: {
       failOnError: false,
-      ignore: ['/reset-password']
+      ignore: ['/reset-password', '/delete-account']
     }
   },
   app: {
