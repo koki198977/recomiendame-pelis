@@ -178,7 +178,8 @@ useHead({
   ],
 });
 
-const token = route.params.token;
+// Obtener token desde params o query
+const token = route.params.token || route.query.token;
 const password = ref("");
 const confirmPassword = ref("");
 const loading = ref(false);

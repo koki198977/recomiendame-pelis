@@ -97,6 +97,17 @@ const loading = ref(false)
 const success = ref(false)
 const error = ref('')
 
+// Verificar si hay un token en la URL y redirigir
+const route = useRoute()
+const router = useRouter()
+
+onMounted(() => {
+  if (route.query.token) {
+    // Redirigir a la página de reset con token
+    router.push(`/reset-password/${route.query.token}`)
+  }
+})
+
 const handleSubmit = async () => {
   if (!email.value) {
     error.value = 'Por favor ingresa tu correo electrónico'
