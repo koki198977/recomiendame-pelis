@@ -3,13 +3,9 @@ version: '3.8'
 services:
   web:
     build: .
-    container_name: recomiendame-web-coach
+    container_name: recomiendame-coach-web
     ports:
-      - '80:80'
-      - '443:443'
-    volumes:
-      - ./ssl:/etc/nginx/ssl
-      - ./nginx-ssl.conf:/etc/nginx/conf.d/default.conf
+      - '8081:80'
     restart: unless-stopped
     environment:
       - NODE_ENV=production
