@@ -267,8 +267,6 @@
 </template>
 
 <script setup>
-// Imports removed since we don't need routing logic here
-
 useHead({
   title: "Recomiéndame Coach - Tu Coach Nutricional con IA",
   meta: [
@@ -279,6 +277,4 @@ useHead({
     },
   ],
 });
-
-// No necesitamos redirección automática ya que el backend envía las URLs correctas
 </script>
