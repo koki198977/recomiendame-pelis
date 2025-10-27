@@ -195,10 +195,20 @@
 </template>
 
 <script setup>
+const route = useRoute()
+const router = useRouter()
+
 useHead({
   title: 'Recomiéndame Coach - Tu Coach Nutricional con IA',
   meta: [
     { name: 'description', content: 'Transforma tu alimentación con planes personalizados creados por inteligencia artificial. Únete a nuestra comunidad y alcanza tus objetivos de salud.' }
   ]
+})
+
+// Detectar si hay un token en la URL y redirigir a reset-password
+onMounted(() => {
+  if (route.query.token) {
+    router.push(`/reset-password?token=${route.query.token}`)
+  }
 })
 </script>
