@@ -267,8 +267,7 @@
 </template>
 
 <script setup>
-const route = useRoute();
-const router = useRouter();
+// Imports removed since we don't need routing logic here
 
 useHead({
   title: "Recomiéndame Coach - Tu Coach Nutricional con IA",
@@ -281,10 +280,5 @@ useHead({
   ],
 });
 
-// Detectar si hay un token en la URL de la página principal y redirigir a reset-password
-onMounted(() => {
-  if (route.path === "/" && route.query.token) {
-    router.push(`/reset-password?token=${route.query.token}`);
-  }
-});
+// No necesitamos redirección automática ya que el backend envía las URLs correctas
 </script>
