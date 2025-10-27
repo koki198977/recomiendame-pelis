@@ -7,7 +7,8 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
   nitro: {
     prerender: {
-      routes: ['/sitemap.xml']
+      failOnError: false,
+      crawlLinks: true
     }
   },
   app: {
