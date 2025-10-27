@@ -193,7 +193,7 @@ const handleSubmit = async () => {
   success.value = false
 
   try {
-    await $fetch(`https://api-coach.recomiendameapp.cl/auth/confirm-account-deletion?token=${token}`, {
+    await $fetch(`https://api-coach.recomiendameapp.cl/confirm-account-deletion?token=${token}`, {
       method: 'GET'
     })
     
