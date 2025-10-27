@@ -6,10 +6,7 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/css/main.css'],
   nitro: {
-    prerender: {
-      failOnError: false,
-      crawlLinks: true
-    }
+    preset: 'static'
   },
   app: {
     head: {

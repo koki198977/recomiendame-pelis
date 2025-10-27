@@ -12,8 +12,8 @@ RUN npm ci
 # Copiar código fuente
 COPY . .
 
-# Generar archivos estáticos
-RUN npm run generate
+# Construir la aplicación
+RUN npm run build
 
 # 2. Etapa de producción con Nginx
 FROM nginx:stable-alpine
@@ -24,7 +24,7 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copia tu configuración de Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copia el build estático (Nuxt genera en .output/public)
+# Copia el build estático (Nuxt build genera en .output/public)
 COPY --from=builder /app/.output/public /usr/share/nginx/html
 
 # Exponemos el puerto 80
