@@ -39,22 +39,22 @@
           <div class="relative">
             <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
               <div
-                class="bg-white rounded-3xl p-4 shadow-strong transform rotate-3 hover:rotate-0 transition-transform duration-300"
+                class="bg-white rounded-3xl p-2 shadow-strong transform rotate-3 hover:rotate-0 transition-transform duration-300"
               >
-                <div
-                  class="bg-gray-100 rounded-2xl h-64 flex items-center justify-center"
-                >
-                  <span class="text-gray-400 text-sm">Pantalla Principal</span>
-                </div>
+                <img 
+                  src="/assets/screen/screen1.jpeg" 
+                  alt="Pantalla Principal de Recomiéndame Coach"
+                  class="w-full h-64 object-cover rounded-2xl"
+                />
               </div>
               <div
-                class="bg-white rounded-3xl p-4 shadow-strong transform -rotate-3 hover:rotate-0 transition-transform duration-300 mt-8"
+                class="bg-white rounded-3xl p-2 shadow-strong transform -rotate-3 hover:rotate-0 transition-transform duration-300 mt-8"
               >
-                <div
-                  class="bg-gray-100 rounded-2xl h-64 flex items-center justify-center"
-                >
-                  <span class="text-gray-400 text-sm">Plan Nutricional</span>
-                </div>
+                <img 
+                  src="/assets/screen/screen2.jpeg" 
+                  alt="Plan Nutricional Personalizado"
+                  class="w-full h-64 object-cover rounded-2xl"
+                />
               </div>
             </div>
           </div>
@@ -121,6 +121,92 @@
               Registra tu progreso diario y ve cómo alcanzas tus objetivos.
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- App Screenshots Gallery -->
+    <section class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h2 class="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
+            Descubre la App
+          </h2>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            Una interfaz intuitiva diseñada para hacer tu experiencia nutricional simple y efectiva
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <!-- Screenshot 1 -->
+          <div class="group">
+            <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
+              <img 
+                src="/assets/screen/screen1.jpeg" 
+                alt="Pantalla de inicio"
+                class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <p class="text-center text-gray-600 mt-3 font-medium">Inicio</p>
+          </div>
+
+          <!-- Screenshot 2 -->
+          <div class="group">
+            <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
+              <img 
+                src="/assets/screen/screen2.jpeg" 
+                alt="Plan nutricional"
+                class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <p class="text-center text-gray-600 mt-3 font-medium">Plan Nutricional</p>
+          </div>
+
+          <!-- Screenshot 3 -->
+          <div class="group">
+            <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
+              <img 
+                src="/assets/screen/screen3.jpeg" 
+                alt="Seguimiento de progreso"
+                class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <p class="text-center text-gray-600 mt-3 font-medium">Progreso</p>
+          </div>
+
+          <!-- Screenshot 4 -->
+          <div class="group">
+            <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
+              <img 
+                src="/assets/screen/screen4.jpeg" 
+                alt="Recetas personalizadas"
+                class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <p class="text-center text-gray-600 mt-3 font-medium">Recetas</p>
+          </div>
+
+          <!-- Screenshot 5 -->
+          <div class="group">
+            <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
+              <img 
+                src="/assets/screen/screen5.jpeg" 
+                alt="Perfil de usuario"
+                class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <p class="text-center text-gray-600 mt-3 font-medium">Perfil</p>
+          </div>
+        </div>
+
+        <!-- Call to action -->
+        <div class="text-center mt-12">
+          <NuxtLink
+            to="/download"
+            class="btn-primary text-lg px-8 py-4"
+          >
+            📱 Prueba la App Gratis
+          </NuxtLink>
         </div>
       </div>
     </section>
