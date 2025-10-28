@@ -139,25 +139,28 @@ const verifyToken = async (token) => {
   status.value = 'verifying'
   
   try {
-    // Simular verificación
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    await $fetch(`https://api-coach.recomiendameapp.cl/auth/verify-email?token=${token}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
     
-    // Aquí iría la llamada real a tu API
-    // const result = await $fetch('/api/auth/verify-email', {
-    //   method: 'POST',
-    //   body: { token }
-    // })
-    
-    // Simular éxito o error aleatoriamente para demo
-    if (Math.random() > 0.3) {
-      status.value = 'success'
-    } else {
-      status.value = 'error'
-      errorMessage.value = 'El enlace de verificación ha expirado.'
-    }
+    status.value = 'success'
   } catch (error) {
+    console.error('Error verifying email:', error)
     status.value = 'error'
-    errorMessage.value = 'Hubo un error al verificar tu email.'
+    
+    if (error.status === 400) {
+      errorMessage.value = 'El enlace de verificación no es válido o ha expirado.'
+    } else if (error.status === 404) {
+      errorMessage.value = 'No se encontró la cuenta asociada a este enlace.'
+    } else if (error.status === 409) {
+      errorMessage.value = 'Esta cuenta ya ha sido verificada anteriormente.'
+    } else {
+      errorMessage.value = 'Hubo un error al verificar tu email. Por favor intenta de nuevo.'
+    }
   }
 }
 

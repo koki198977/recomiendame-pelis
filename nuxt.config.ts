@@ -7,7 +7,8 @@ export default defineNuxtConfig({
     preset: "static",
     prerender: {
       failOnError: false,
-      routes: ['/reset-password', '/delete-account', '/request-delete-account']
+      routes: ['/reset-password', '/delete-account', '/request-delete-account', '/verify-email'],
+      ignore: ['/auth/verify-email']
     }
   },
   app: {
