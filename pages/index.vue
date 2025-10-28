@@ -42,7 +42,7 @@
                 class="bg-white rounded-3xl p-2 shadow-strong transform rotate-3 hover:rotate-0 transition-transform duration-300"
               >
                 <img 
-                  src="/assets/screen/screen1.jpeg" 
+                  src="/screen1.jpeg" 
                   alt="Pantalla Principal de Recomiéndame Coach"
                   class="w-full h-64 object-cover rounded-2xl"
                 />
@@ -51,7 +51,7 @@
                 class="bg-white rounded-3xl p-2 shadow-strong transform -rotate-3 hover:rotate-0 transition-transform duration-300 mt-8"
               >
                 <img 
-                  src="/assets/screen/screen2.jpeg" 
+                  src="/screen2.jpeg" 
                   alt="Plan Nutricional Personalizado"
                   class="w-full h-64 object-cover rounded-2xl"
                 />
@@ -142,7 +142,7 @@
           <div class="group">
             <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
               <img 
-                src="/assets/screen/screen1.jpeg" 
+                src="/screen1.jpeg" 
                 alt="Pantalla de inicio"
                 class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
               />
@@ -154,7 +154,7 @@
           <div class="group">
             <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
               <img 
-                src="/assets/screen/screen2.jpeg" 
+                src="/screen2.jpeg" 
                 alt="Plan nutricional"
                 class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
               />
@@ -166,7 +166,7 @@
           <div class="group">
             <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
               <img 
-                src="/assets/screen/screen3.jpeg" 
+                src="/screen3.jpeg" 
                 alt="Seguimiento de progreso"
                 class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
               />
@@ -178,7 +178,7 @@
           <div class="group">
             <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
               <img 
-                src="/assets/screen/screen4.jpeg" 
+                src="/screen4.jpeg" 
                 alt="Recetas personalizadas"
                 class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
               />
@@ -190,7 +190,7 @@
           <div class="group">
             <div class="bg-white rounded-2xl p-3 shadow-medium hover:shadow-strong transition-shadow duration-300">
               <img 
-                src="/assets/screen/screen5.jpeg" 
+                src="/screen5.jpeg" 
                 alt="Perfil de usuario"
                 class="w-full h-80 object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
               />
