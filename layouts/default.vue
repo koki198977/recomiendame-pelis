@@ -3,10 +3,10 @@
     <!-- Navigation -->
     <nav class="bg-white shadow-soft sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
+        <div class="flex justify-between items-center h-20">
           <!-- Logo -->
           <NuxtLink to="/" class="flex items-center space-x-3">
-            <img src="/assets/logo.png" alt="Recomiéndame Coach" class="h-8 w-auto" />
+            <img src="/assets/logo.png" alt="Recomiéndame Coach" class="h-12 w-auto" />
             <span class="text-xl font-bold text-gray-900">Recomiéndame Coach</span>
           </NuxtLink>
 
@@ -62,7 +62,7 @@
           <!-- Logo and description -->
           <div class="col-span-1 md:col-span-2">
             <div class="flex items-center space-x-3 mb-4">
-              <img src="/assets/logo.png" alt="Recomiéndame Coach" class="h-8 w-auto" />
+              <img src="/assets/logo.png" alt="Recomiéndame Coach" class="h-10 w-auto" />
               <span class="text-xl font-bold">Recomiéndame Coach</span>
             </div>
             <p class="text-gray-400 mb-4">
