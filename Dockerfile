@@ -12,6 +12,10 @@ RUN npm ci
 # Copiar código fuente
 COPY . .
 
+# Asegurar que las imágenes estén en public antes del build
+RUN cp assets/logo.png public/ || true
+RUN cp assets/screens/screen*.jpeg public/ || true
+
 # Construir la aplicación
 RUN npm run build
 
