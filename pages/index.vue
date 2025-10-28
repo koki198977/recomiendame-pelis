@@ -26,16 +26,12 @@
             <div
               class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <button
+              <NuxtLink
+                to="/download"
                 class="btn-primary bg-white text-primary-500 hover:bg-gray-50"
               >
                 📱 Descargar App
-              </button>
-              <button
-                class="btn-secondary border-white text-white hover:bg-white hover:text-primary-500"
-              >
-                🎥 Ver Demo
-              </button>
+              </NuxtLink>
             </div>
           </div>
 
@@ -65,117 +61,7 @@
         </div>
       </div>
     </section>
-    < !-- Features Section -->
-    <section class="py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
-            ¿Por qué elegir Recomiéndame Coach?
-          </h2>
-          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Combina la potencia de la inteligencia artificial con el apoyo de
-            una comunidad real
-          </p>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <!-- Feature 1 -->
-          <div class="card-hover text-center">
-            <div
-              class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-3xl">🤖</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              IA Personalizada
-            </h3>
-            <p class="text-gray-600">
-              Planes nutricionales únicos creados específicamente para tus
-              objetivos, preferencias y estilo de vida.
-            </p>
-          </div>
-
-          <!-- Feature 2 -->
-          <div class="card-hover text-center">
-            <div
-              class="w-16 h-16 bg-secondary-100 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-3xl">📊</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Seguimiento Inteligente
-            </h3>
-            <p class="text-gray-600">
-              Monitorea tu progreso con métricas avanzadas y ajustes automáticos
-              en tiempo real.
-            </p>
-          </div>
-
-          <!-- Feature 3 -->
-          <div class="card-hover text-center">
-            <div
-              class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-3xl">👥</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Comunidad Activa
-            </h3>
-            <p class="text-gray-600">
-              Conecta con personas que comparten tus objetivos y mantente
-              motivado cada día.
-            </p>
-          </div>
-
-          <!-- Feature 4 -->
-          <div class="card-hover text-center">
-            <div
-              class="w-16 h-16 bg-secondary-100 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-3xl">🛒</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Lista de Compras
-            </h3>
-            <p class="text-gray-600">
-              Genera automáticamente listas de compras optimizadas basadas en tu
-              plan semanal.
-            </p>
-          </div>
-
-          <!-- Feature 5 -->
-          <div class="card-hover text-center">
-            <div
-              class="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-3xl">📝</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Check-in Diario
-            </h3>
-            <p class="text-gray-600">
-              Registra tu progreso diario y recibe retroalimentación
-              personalizada de la IA.
-            </p>
-          </div>
-
-          <!-- Feature 6 -->
-          <div class="card-hover text-center">
-            <div
-              class="w-16 h-16 bg-secondary-100 rounded-2xl flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-3xl">🎯</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Objetivos Claros
-            </h3>
-            <p class="text-gray-600">
-              Define y alcanza tus metas con planes estructurados y medibles.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
     <!-- How it Works Section -->
     <section class="py-20 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -250,16 +136,12 @@
           Recomiéndame Coach
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
+          <NuxtLink
+            to="/download"
             class="btn-primary bg-white text-primary-500 hover:bg-gray-50"
           >
             📱 Descargar Gratis
-          </button>
-          <button
-            class="btn-secondary border-white text-white hover:bg-white hover:text-primary-500"
-          >
-            📧 Más Información
-          </button>
+          </NuxtLink>
         </div>
       </div>
     </section>

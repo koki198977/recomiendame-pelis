@@ -11,9 +11,9 @@
           <p class="text-gray-600 mb-6">
             Esta página requiere un token de restablecimiento válido.
           </p>
-          <NuxtLink to="/request-reset-password" class="btn-primary">
+          <a href="https://coach.recomiendameapp.cl/request-reset-password" class="btn-primary">
             Solicitar Restablecimiento
-          </NuxtLink>
+          </a>
         </div>
 
         <!-- Formulario cuando hay token -->
