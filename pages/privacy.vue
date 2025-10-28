@@ -154,21 +154,6 @@
           </p>
         </section>
 
-        <!-- Contacto -->
-        <section>
-          <h2 class="text-2xl font-bold text-gray-900 mb-4">11. Contacto</h2>
-          <p class="text-gray-700 leading-relaxed mb-4">
-            Si tienes preguntas sobre esta Política de Privacidad o deseas ejercer tus derechos, 
-            puedes contactarnos:
-          </p>
-          <div class="bg-gray-50 rounded-xl p-6">
-            <ul class="space-y-2 text-gray-700">
-              <li><strong>Email:</strong> privacy@recomiendameapp.cl</li>
-              <li><strong>Dirección:</strong> Santiago, Chile</li>
-              <li><strong>Teléfono:</strong> +56 9 XXXX XXXX</li>
-            </ul>
-          </div>
-        </section>
       </div>
 
       <!-- Back to home -->
