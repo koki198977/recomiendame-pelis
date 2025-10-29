@@ -1,140 +1,193 @@
 <template>
-  <div>
+  <div class="bg-surface-950 text-white min-h-screen flex flex-col">
     <!-- Navigation -->
-    <nav class="bg-white shadow-soft sticky top-0 z-50">
+    <nav
+      class="sticky top-0 z-50 backdrop-blur border-b border-white/10 bg-surface-950/80"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
+        <div class="flex items-center justify-between h-20">
           <!-- Logo -->
-          <NuxtLink to="/" class="flex items-center space-x-3">
-            <img src="/logo.png" alt="Recomiéndame Coach" class="h-12 w-auto" />
-            <span class="text-xl font-bold text-gray-900"
-              >Recomiéndame Coach</span
-            >
+          <NuxtLink :to="isAuthenticated ? '/dashboard' : '/'" class="flex items-center gap-3">
+            <img :src="logoUrl" alt="Recomiéndame" class="h-10 w-10" />
+            <div class="leading-tight">
+              <span class="block text-lg font-semibold tracking-tight"
+                >Recomiéndame</span
+              >
+              <span class="block text-xs text-white/60"
+                >Películas y series con IA</span
+              >
+            </div>
           </NuxtLink>
 
           <!-- Navigation Links -->
-          <div class="hidden md:flex items-center space-x-8">
-            <NuxtLink
-              to="/"
-              class="text-gray-600 hover:text-primary-500 font-medium transition-colors"
-            >
-              Inicio
-            </NuxtLink>
-            <NuxtLink
-              to="/features"
-              class="text-gray-600 hover:text-primary-500 font-medium transition-colors"
-            >
-              Características
-            </NuxtLink>
-            <NuxtLink to="/download" class="btn-primary text-sm">
-              📱 Descargar
-            </NuxtLink>
+          <div class="hidden md:flex items-center gap-8">
+            <template v-if="isAuthenticated">
+              <NuxtLink
+                v-for="item in authenticatedNav"
+                :key="item.to"
+                :to="item.to"
+                :class="navLinkClass(item.to)"
+              >
+                {{ item.label }}
+              </NuxtLink>
+              <button
+                class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/70 hover:bg-white/10 transition"
+                @click="logout"
+              >
+                <span>Cerrar sesión</span>
+                <span aria-hidden="true">↩</span>
+              </button>
+            </template>
+            <template v-else>
+              <NuxtLink
+                to="/features"
+                class="text-sm font-medium text-white/70 hover:text-white transition"
+              >
+                Funcionalidades
+              </NuxtLink>
+              <NuxtLink
+                to="/download"
+                class="text-sm font-medium text-white/70 hover:text-white transition"
+              >
+                Apps móviles
+              </NuxtLink>
+              <NuxtLink
+                to="/login"
+                class="inline-flex items-center rounded-full bg-primary-500 px-4 py-2 text-sm font-semibold shadow-soft hover:bg-primary-400 transition"
+              >
+                Ingresar
+              </NuxtLink>
+            </template>
           </div>
 
           <!-- Mobile menu button -->
-          <div class="md:hidden">
-            <button
-              @click="mobileMenuOpen = !mobileMenuOpen"
-              class="text-gray-600 hover:text-primary-500"
+          <button
+            class="md:hidden text-white/80 hover:text-white transition"
+            @click="mobileMenuOpen = !mobileMenuOpen"
+            aria-label="Menu"
+          >
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              <svg
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
         </div>
 
         <!-- Mobile menu -->
         <div
           v-if="mobileMenuOpen"
-          class="md:hidden py-4 border-t border-gray-200"
+          class="md:hidden pb-6 border-t border-white/10"
         >
-          <div class="flex flex-col space-y-4">
-            <NuxtLink
-              to="/"
-              class="text-gray-600 hover:text-primary-500 font-medium"
-            >
-              Inicio
-            </NuxtLink>
-            <NuxtLink
-              to="/features"
-              class="text-gray-600 hover:text-primary-500 font-medium"
-            >
-              Características
-            </NuxtLink>
-            <NuxtLink to="/download" class="btn-primary text-sm inline-block">
-              📱 Descargar
-            </NuxtLink>
+          <div class="flex flex-col gap-4 pt-4 text-sm">
+            <template v-if="isAuthenticated">
+              <NuxtLink
+                v-for="item in authenticatedNav"
+                :key="`mobile-${item.to}`"
+                :to="item.to"
+                :class="['block', navLinkClass(item.to)]"
+                @click="mobileMenuOpen = false"
+              >
+                {{ item.label }}
+              </NuxtLink>
+              <button
+                class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 font-semibold text-white/70 hover:bg-white/10 transition"
+                @click="logout"
+              >
+                <span>Cerrar sesión</span>
+                <span aria-hidden="true">↩</span>
+              </button>
+            </template>
+            <template v-else>
+              <NuxtLink
+                to="/features"
+                class="text-white/70 hover:text-white transition"
+              >
+                Funcionalidades
+              </NuxtLink>
+              <NuxtLink
+                to="/download"
+                class="text-white/70 hover:text-white transition"
+              >
+                Apps móviles
+              </NuxtLink>
+              <NuxtLink
+                to="/login"
+                class="inline-flex items-center justify-center rounded-full bg-primary-500 px-4 py-2 font-semibold shadow-soft hover:bg-primary-400 transition"
+              >
+                Ingresar
+              </NuxtLink>
+            </template>
           </div>
         </div>
       </div>
     </nav>
 
     <!-- Main content -->
-    <main>
+    <main class="flex-1">
       <slot />
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
+    <footer class="border-t border-white/10 bg-surface-950 py-14">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
           <!-- Logo and description -->
-          <div class="col-span-1 md:col-span-2">
-            <div class="flex items-center space-x-3 mb-4">
-              <img
-                src="/logo.png"
-                alt="Recomiéndame Coach"
-                class="h-10 w-auto"
-              />
-              <span class="text-xl font-bold">Recomiéndame Coach</span>
+          <div class="col-span-1 md:col-span-2 space-y-4">
+            <div class="flex items-center gap-3">
+              <img :src="logoUrl" alt="Recomiéndame" class="h-10 w-10" />
+              <div>
+                <p class="text-lg font-semibold">Recomiéndame</p>
+                <p class="text-xs text-white/60">
+                  Tu copiloto de streaming inteligente
+                </p>
+              </div>
             </div>
-            <p class="text-gray-400 mb-4">
-              Tu coach nutricional con inteligencia artificial. Planes
-              personalizados para alcanzar tus objetivos de salud.
+            <p class="text-sm text-white/60 max-w-md">
+              Analiza lo que ya viste, entiende tus géneros favoritos y te
+              propone películas y series que de verdad vas a disfrutar. Disponible
+              en web y apps móviles.
             </p>
           </div>
 
           <!-- Links -->
           <div>
-            <h3 class="text-lg font-semibold mb-4">Enlaces</h3>
-            <ul class="space-y-2">
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-white/60">
+              Navegación
+            </h3>
+            <ul class="mt-4 space-y-2 text-sm">
               <li>
-                <NuxtLink
-                  to="/"
-                  class="text-gray-400 hover:text-white transition-colors"
+                <NuxtLink to="/" class="text-white/70 hover:text-white transition"
                   >Inicio</NuxtLink
                 >
               </li>
               <li>
                 <NuxtLink
                   to="/features"
-                  class="text-gray-400 hover:text-white transition-colors"
-                  >Características</NuxtLink
+                  class="text-white/70 hover:text-white transition"
+                  >Funcionalidades</NuxtLink
                 >
               </li>
               <li>
                 <NuxtLink
                   to="/download"
-                  class="text-gray-400 hover:text-white transition-colors"
-                  >Descargar</NuxtLink
+                  class="text-white/70 hover:text-white transition"
+                  >Apps móviles</NuxtLink
                 >
               </li>
               <li>
                 <NuxtLink
-                  to="/contact"
-                  class="text-gray-400 hover:text-white transition-colors"
-                  >Contacto</NuxtLink
+                  to="/login"
+                  class="text-white/70 hover:text-white transition"
+                  >Accede a tu cuenta</NuxtLink
                 >
               </li>
             </ul>
@@ -142,50 +195,96 @@
 
           <!-- Support -->
           <div>
-            <h3 class="text-lg font-semibold mb-4">Soporte</h3>
-            <ul class="space-y-2">
-              <li>
-                <a
-                  href="https://coach.recomiendameapp.cl/request-reset-password"
-                  class="text-gray-400 hover:text-white transition-colors"
-                  >Restablecer Contraseña</a
-                >
-              </li>
-              <li>
-                <NuxtLink
-                  to="/terms"
-                  class="text-gray-400 hover:text-white transition-colors"
-                  >Términos</NuxtLink
-                >
-              </li>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-white/60">
+              Soporte
+            </h3>
+            <ul class="mt-4 space-y-2 text-sm">
               <li>
                 <NuxtLink
                   to="/privacy"
-                  class="text-gray-400 hover:text-white transition-colors"
+                  class="text-white/70 hover:text-white transition"
                   >Privacidad</NuxtLink
                 >
               </li>
               <li>
                 <NuxtLink
+                  to="/terms"
+                  class="text-white/70 hover:text-white transition"
+                  >Términos</NuxtLink
+                >
+              </li>
+              <li>
+                <NuxtLink
                   to="/request-delete-account"
-                  class="text-gray-400 hover:text-white transition-colors"
-                  >Eliminar Cuenta</NuxtLink
+                  class="text-white/70 hover:text-white transition"
+                  >Eliminar cuenta</NuxtLink
                 >
               </li>
             </ul>
           </div>
         </div>
 
-        <div class="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p class="text-gray-400">
-            © 2025 Recomiéndame Coach. Todos los derechos reservados.
-          </p>
+        <div class="mt-12 border-t border-white/10 pt-6 text-center text-xs text-white/50">
+          © {{ new Date().getFullYear() }} Recomiéndame. Todos los derechos reservados.
         </div>
       </div>
     </footer>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import logoUrl from '~/assets/logo.png?url';
+import {
+  useAuthToken,
+  useAuthUser,
+  syncAuthState,
+} from '~/composables/useAuthState';
+
 const mobileMenuOpen = ref(false);
+const route = useRoute();
+const router = useRouter();
+
+const tokenState = useAuthToken();
+const userState = useAuthUser();
+const isAuthenticated = computed(() => Boolean(tokenState.value));
+
+const authenticatedNav = [
+  { to: '/dashboard', label: 'Inicio' },
+  { to: '/recommendations', label: 'Recomendaciones' },
+  { to: '/seen', label: 'Vistos' },
+  { to: '/favorites', label: 'Favoritos' },
+  { to: '/wishlist', label: 'Wishlist' },
+  { to: '/profile', label: 'Perfil' },
+];
+
+const navLinkClass = (path: string) => {
+  const active =
+    path === '/dashboard' ? route.path === path : route.path.startsWith(path);
+  return [
+    'text-sm font-medium transition',
+    active ? 'text-white font-semibold' : 'text-white/70 hover:text-white',
+  ].join(' ');
+};
+
+const logout = () => {
+  if (!process.client) return;
+  localStorage.removeItem('recomiendame_token');
+  localStorage.removeItem('recomiendame_refresh');
+  localStorage.removeItem('recomiendame_user');
+  tokenState.value = null;
+  userState.value = null;
+  mobileMenuOpen.value = false;
+  router.push('/');
+};
+
+onMounted(() => {
+  if (!process.client) return;
+  syncAuthState();
+  window.addEventListener('storage', syncAuthState);
+});
+
+onBeforeUnmount(() => {
+  if (!process.client) return;
+  window.removeEventListener('storage', syncAuthState);
+});
 </script>

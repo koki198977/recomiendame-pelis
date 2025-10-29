@@ -138,9 +138,9 @@ const route = useRoute()
 const router = useRouter()
 
 useHead({
-  title: 'Nueva Contraseña - Recomiéndame Coach',
+  title: 'Nueva Contraseña - Recomiéndame',
   meta: [
-    { name: 'description', content: 'Establece tu nueva contraseña para Recomiéndame Coach.' }
+    { name: 'description', content: 'Establece tu nueva contraseña para Recomiéndame.' }
   ]
 })
 

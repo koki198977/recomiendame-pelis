@@ -11,75 +11,106 @@
         <section class="mb-8">
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">1. Aceptación de los Términos</h2>
           <p class="text-gray-700 leading-relaxed">
-            Al acceder y utilizar la aplicación Recomiéndame Coach, usted acepta estar sujeto a estos términos y condiciones de uso. Si no está de acuerdo con alguna parte de estos términos, no debe utilizar nuestra aplicación.
+            Al acceder y utilizar la plataforma Recomiéndame —incluyendo la versión web y las aplicaciones móviles— confirmas que has leído, entendido y aceptas cumplir estos Términos y Condiciones. Si no estás de acuerdo con alguno de los apartados, debes abstenerte de utilizar el servicio.
           </p>
         </section>
 
         <section class="mb-8">
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">2. Descripción del Servicio</h2>
           <p class="text-gray-700 leading-relaxed mb-4">
-            Recomiéndame Coach es una aplicación de coaching nutricional que utiliza inteligencia artificial para proporcionar:
+            Recomiéndame es un asistente inteligente que analiza tus gustos audiovisuales para sugerirte películas y series. El servicio ofrece, entre otros, los siguientes módulos:
           </p>
           <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
-            <li>Planes nutricionales personalizados</li>
-            <li>Seguimiento de progreso</li>
-            <li>Recomendaciones alimentarias</li>
-            <li>Funciones de comunidad social</li>
-            <li>Herramientas de planificación de comidas</li>
+            <li>Generación de recomendaciones personalizadas mediante inteligencia artificial.</li>
+            <li>Listas de seguimiento (vistos, favoritos y wishlist) sincronizadas entre dispositivos.</li>
+            <li>Alertas sobre estrenos, cambios de catálogo y contenido relevante según tus plataformas.</li>
+            <li>Estadísticas y resúmenes basados en tus calificaciones y preferencias.</li>
           </ul>
+          <p class="text-gray-700 leading-relaxed mt-4">
+            No alojamos ni reproducimos contenido audiovisual. Las recomendaciones incluyen enlaces informativos sobre su disponibilidad en catálogos de terceros.
+          </p>
         </section>
 
         <section class="mb-8">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-4">3. Registro y Cuenta de Usuario</h2>
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">3. Registro y Seguridad de la Cuenta</h2>
           <p class="text-gray-700 leading-relaxed mb-4">
-            Para utilizar nuestros servicios, debe crear una cuenta proporcionando información precisa y completa. Usted es responsable de:
+            Para aprovechar todas las funcionalidades debes crear una cuenta proporcionando datos veraces. Te comprometes a:
           </p>
           <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
-            <li>Mantener la confidencialidad de su contraseña</li>
-            <li>Todas las actividades que ocurran bajo su cuenta</li>
-            <li>Notificar inmediatamente cualquier uso no autorizado</li>
+            <li>Mantener tu contraseña confidencial y segura.</li>
+            <li>Notificar de inmediato cualquier acceso no autorizado a tu cuenta.</li>
+            <li>No compartir tu cuenta ni permitir el uso simultáneo por terceros.</li>
           </ul>
         </section>
 
         <section class="mb-8">
           <h2 class="text-2xl font-semibold text-gray-900 mb-4">4. Uso Aceptable</h2>
           <p class="text-gray-700 leading-relaxed mb-4">
-            Al utilizar Recomiéndame Coach, usted se compromete a:
+            Al utilizar Recomiéndame aceptas no realizar acciones que puedan afectar la integridad del servicio o de otros usuarios. En particular te comprometes a no:
           </p>
           <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
-            <li>Proporcionar información precisa sobre su salud y objetivos</li>
-            <li>No compartir contenido ofensivo o inapropiado</li>
-            <li>Respetar a otros usuarios de la comunidad</li>
-            <li>No intentar acceder a cuentas de otros usuarios</li>
-            <li>No utilizar la aplicación para fines comerciales no autorizados</li>
+            <li>Intentar vulnerar la seguridad, infraestructura o datos del sistema.</li>
+            <li>Automatizar accesos o realizar scraping sin autorización previa.</li>
+            <li>Publicar contenido ofensivo, ilegal o que infrinja derechos de terceros.</li>
+            <li>Utilizar la plataforma con fines comerciales no autorizados por Recomiéndame.</li>
           </ul>
         </section>
 
         <section class="mb-8">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Limitaciones de Responsabilidad</h2>
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">5. Recomendaciones y Disponibilidad</h2>
+          <p class="text-gray-700 leading-relaxed mb-4">
+            Las sugerencias se generan en base a los datos que proporcionas, tu actividad en la plataforma y fuentes de información externas. Aunque trabajamos para mantener los catálogos actualizados:
+          </p>
+          <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4">
+            <li>No garantizamos la disponibilidad, calidad o vigencia de los títulos recomendados.</li>
+            <li>Las plataformas de streaming pueden modificar su catálogo sin previo aviso.</li>
+            <li>Recomiéndame no se responsabiliza por cobros, políticas o experiencias dentro de servicios de terceros.</li>
+          </ul>
+        </section>
+
+        <section class="mb-8">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Contenido y Propiedad Intelectual</h2>
+          <p class="text-gray-700 leading-relaxed mb-4">
+            La marca Recomiéndame, sus logos, diseño, software y base de datos son propiedad de sus titulares y están protegidos por la legislación vigente. Queda prohibido copiar, distribuir o modificar cualquier parte del servicio sin autorización escrita.
+          </p>
           <p class="text-gray-700 leading-relaxed">
-            Recomiéndame Coach proporciona información y recomendaciones nutricionales con fines educativos. No somos un sustituto del consejo médico profesional. Siempre consulte con un profesional de la salud antes de realizar cambios significativos en su dieta o estilo de vida.
+            El contenido descriptivo de terceros (sinopsis, posters, trailers) pertenece a cada proveedor. Se utiliza únicamente con fines informativos según los acuerdos y licencias correspondientes.
           </p>
         </section>
 
         <section class="mb-8">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-4">6. Propiedad Intelectual</h2>
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Privacidad y Datos Personales</h2>
           <p class="text-gray-700 leading-relaxed">
-            Todo el contenido de la aplicación, incluyendo textos, gráficos, logos, y software, es propiedad de Recomiéndame Coach y está protegido por las leyes de propiedad intelectual.
+            Tratamos tus datos personales conforme a nuestra
+            <NuxtLink to="/privacy" class="text-primary-600 hover:text-primary-700 font-semibold">
+              Política de Privacidad
+            </NuxtLink>.
+            Al utilizar Recomiéndame aceptas que recopilemos y procesemos información necesaria para operar el servicio, mejorar las recomendaciones y comunicarnos contigo.
           </p>
         </section>
 
         <section class="mb-8">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-4">7. Modificaciones</h2>
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">8. Modificaciones del Servicio</h2>
           <p class="text-gray-700 leading-relaxed">
-            Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios serán efectivos inmediatamente después de su publicación en la aplicación.
+            Podemos actualizar las funcionalidades, precios o condiciones de uso en cualquier momento. De producirse un cambio relevante te lo comunicaremos por los medios habilitados. El uso continuado del servicio después de la actualización implica la aceptación de las nuevas condiciones.
           </p>
         </section>
 
         <section class="mb-8">
-          <h2 class="text-2xl font-semibold text-gray-900 mb-4">8. Contacto</h2>
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">9. Limitación de Responsabilidad</h2>
           <p class="text-gray-700 leading-relaxed">
-            Si tiene preguntas sobre estos términos y condiciones, puede contactarnos a través de nuestra página de contacto o enviando un correo electrónico a legal@recomiendamecoach.com
+            Recomiéndame se ofrece “tal cual”. No garantizamos que el servicio esté libre de interrupciones o errores. En ningún caso seremos responsables por daños indirectos, lucro cesante o pérdida de datos ocasionada por el uso o la imposibilidad de uso de la plataforma.
+          </p>
+        </section>
+
+        <section class="mb-8">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-4">10. Contacto</h2>
+          <p class="text-gray-700 leading-relaxed">
+            Si tienes preguntas sobre estos términos, escríbenos a
+            <a href="mailto:legal@recomiendameapp.cl" class="text-primary-600 hover:text-primary-700 font-semibold">
+              legal@recomiendameapp.cl
+            </a>.
+            También puedes iniciar una solicitud desde la sección de soporte dentro de la aplicación.
           </p>
         </section>
       </div>
@@ -100,9 +131,9 @@
 
 <script setup>
 useHead({
-  title: 'Términos y Condiciones - Recomiéndame Coach',
+  title: 'Términos y Condiciones - Recomiéndame',
   meta: [
-    { name: 'description', content: 'Términos y condiciones de uso de Recomiéndame Coach. Conoce tus derechos y responsabilidades al utilizar nuestra aplicación de coaching nutricional.' }
+    { name: 'description', content: 'Términos y condiciones de uso de Recomiéndame, la plataforma inteligente que te sugiere películas y series personalizadas.' }
   ]
 })
 </script>

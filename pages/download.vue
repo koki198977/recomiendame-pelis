@@ -4,7 +4,7 @@
     <section class="bg-gradient-to-br from-primary-500 to-primary-700 text-white py-20">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h1 class="text-4xl lg:text-6xl font-bold mb-6">
-          Descarga Recomiéndame Coach
+          Descarga Recomiéndame
         </h1>
         <p class="text-xl lg:text-2xl mb-8 text-primary-100">
           Disponible gratis para iOS y Android
@@ -132,7 +132,7 @@
           <div class="bg-white rounded-2xl p-6 shadow-soft">
             <h3 class="text-lg font-semibold text-gray-900 mb-2">¿La app es gratuita?</h3>
             <p class="text-gray-600">
-              Sí, Recomiéndame Coach es completamente gratuita. Puedes acceder a todas las funciones básicas sin costo alguno.
+              Sí, Recomiéndame es completamente gratuita. Puedes acceder a todas las funciones básicas sin costo alguno.
             </p>
           </div>
 
@@ -192,9 +192,9 @@
 
 <script setup>
 useHead({
-  title: 'Descargar App - Recomiéndame Coach',
+  title: 'Descargar App - Recomiéndame',
   meta: [
-    { name: 'description', content: 'Descarga gratis Recomiéndame Coach para iOS y Android. Tu coach nutricional con inteligencia artificial disponible en App Store y Google Play.' }
+    { name: 'description', content: 'Descarga gratis Recomiéndame para iOS y Android. Tu coach nutricional con inteligencia artificial disponible en App Store y Google Play.' }
   ]
 })
 </script>

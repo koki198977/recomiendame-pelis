@@ -9,7 +9,7 @@
           </div>
           <h1 class="text-4xl font-bold text-gray-900 mb-4">Política de Privacidad</h1>
           <p class="text-xl text-gray-600">
-            En Recomiéndame Coach, tu privacidad es nuestra prioridad
+            En Recomiéndame, tu privacidad es nuestra prioridad
           </p>
           <p class="text-sm text-gray-500 mt-2">
             Última actualización: {{ lastUpdated }}
@@ -23,7 +23,7 @@
         <section>
           <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Introducción</h2>
           <p class="text-gray-700 leading-relaxed">
-            Esta Política de Privacidad describe cómo Recomiéndame Coach ("nosotros", "nuestro" o "la aplicación") 
+            Esta Política de Privacidad describe cómo Recomiéndame ("nosotros", "nuestro" o "la aplicación") 
             recopila, usa y protege tu información personal cuando utilizas nuestra aplicación móvil y servicios web.
           </p>
         </section>
@@ -168,11 +168,11 @@
 
 <script setup>
 useHead({
-  title: 'Política de Privacidad - Recomiéndame Coach',
+  title: 'Política de Privacidad - Recomiéndame',
   meta: [
     {
       name: 'description',
-      content: 'Conoce cómo Recomiéndame Coach protege tu información personal y respeta tu privacidad.'
+      content: 'Conoce cómo Recomiéndame protege tu información personal y respeta tu privacidad.'
     }
   ]
 })

@@ -1,6 +1,6 @@
-# Recomiéndame Coach - Sitio Web
+# Recomiéndame - Sitio Web
 
-Sitio web oficial de Recomiéndame Coach, tu coach nutricional con inteligencia artificial.
+Sitio web oficial de Recomiéndame, tu coach nutricional con inteligencia artificial.
 
 ## 🚀 Características
 
@@ -63,7 +63,7 @@ npm run preview
 ## 📁 Estructura del Proyecto
 
 ```
-recomiendame-web/
+recomiendame-pelis/
 ├── assets/
 │   └── css/
 │       └── main.css          # Estilos globales y Tailwind
@@ -150,4 +150,4 @@ Para soporte técnico o consultas sobre el sitio web:
 
 ---
 
-Desarrollado con ❤️ para Recomiéndame Coach
+Desarrollado con ❤️ para Recomiéndame

@@ -231,9 +231,9 @@
 
 <script setup>
 useHead({
-  title: 'Contacto - Recomiéndame Coach',
+  title: 'Contacto - Recomiéndame',
   meta: [
-    { name: 'description', content: 'Contáctanos para resolver tus dudas sobre Recomiéndame Coach. Soporte técnico, sugerencias y consultas comerciales. Estamos aquí para ayudarte.' }
+    { name: 'description', content: 'Contáctanos para resolver tus dudas sobre Recomiéndame. Soporte técnico, sugerencias y consultas comerciales. Estamos aquí para ayudarte.' }
   ]
 })
 
