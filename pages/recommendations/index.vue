@@ -124,6 +124,7 @@
               @mark-favorite="(entry) => markFavorite(entry)"
               @mark-seen="(entry) => markSeen(entry)"
               @mark-wishlist="(entry) => markWishlist(entry)"
+              @share="openShare"
             />
           </article>
         </div>
@@ -237,12 +238,18 @@
         </div>
       </transition>
     </Teleport>
+    <ShareDialog
+      :item="shareTarget"
+      :show="Boolean(shareTarget)"
+      @close="closeShare"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { nextTick } from "vue";
 import RecommendationCard from "~/components/RecommendationCard.vue";
+import ShareDialog from "~/components/ShareDialog.vue";
 import {
   useAuthToken,
   useAuthUser,
@@ -273,6 +280,7 @@ const feedbackType = ref<"success" | "info" | "error">("info");
 const lastUpdated = ref<string | null>(null);
 const activeRecommendation = ref<RecommendationItem | null>(null);
 const modalContainer = ref<HTMLDivElement | null>(null);
+const shareTarget = ref<RecommendationItem | null>(null);
 
 const promptSuggestions = [
   "Películas de terror inteligente con finales sorprendentes",
@@ -472,6 +480,14 @@ const openDetails = (item: RecommendationItem) => {
 
 const closeDetails = () => {
   activeRecommendation.value = null;
+};
+
+const openShare = (item: RecommendationItem) => {
+  shareTarget.value = item;
+};
+
+const closeShare = () => {
+  shareTarget.value = null;
 };
 
 const activeStates = computed(() => getStates(activeRecommendation.value));

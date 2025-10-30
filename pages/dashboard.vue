@@ -282,6 +282,13 @@
               >
                 {{ getItemStates(item).wishlist ? "⭐ En wishlist" : "⭐ Añadir a wishlist" }}
               </button>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                @click.stop="handleShare(item)"
+              >
+                🔗 Compartir
+              </button>
             </div>
           </div>
         </article>
@@ -381,19 +388,26 @@
                   </button>
                   <button
                     type="button"
-                    :class="actionButtonClass(getItemStates(activeRecommendation).wishlist)"
-                    :disabled="getItemStates(activeRecommendation).wishlist"
-                    @click="handleWishlist(activeRecommendation)"
-                  >
-                    {{
-                      getItemStates(activeRecommendation).wishlist
-                        ? "⭐ En wishlist"
-                        : "⭐ Añadir a wishlist"
-                    }}
-                  </button>
-                  <a
-                    v-if="activeRecommendation?.trailerUrl"
-                    :href="activeRecommendation.trailerUrl"
+                :class="actionButtonClass(getItemStates(activeRecommendation).wishlist)"
+                :disabled="getItemStates(activeRecommendation).wishlist"
+                @click="handleWishlist(activeRecommendation)"
+              >
+                {{
+                  getItemStates(activeRecommendation).wishlist
+                    ? "⭐ En wishlist"
+                    : "⭐ Añadir a wishlist"
+                }}
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                @click="handleShare(activeRecommendation)"
+              >
+                🔗 Compartir
+              </button>
+              <a
+                v-if="activeRecommendation?.trailerUrl"
+                :href="activeRecommendation.trailerUrl"
                     target="_blank"
                     rel="noopener"
                     class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
@@ -407,6 +421,11 @@
         </div>
       </transition>
     </Teleport>
+    <ShareDialog
+      :item="shareTarget"
+      :show="Boolean(shareTarget)"
+      @close="shareTarget = null"
+    />
 
     <!-- Favorites and Seen -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 grid gap-10 lg:grid-cols-2">
@@ -529,7 +548,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch, nextTick } from "vue";
+import { computed, reactive, ref, watch, nextTick, onMounted } from "vue";
+import ShareDialog from "~/components/ShareDialog.vue";
 import {
   useAuthToken,
   useAuthUser,
@@ -671,6 +691,7 @@ const collections = useCollections();
 const topRecommendations = ref<RecommendationItem[]>([]);
 const activeRecommendation = ref<RecommendationItem | null>(null);
 const modalContainer = ref<HTMLDivElement | null>(null);
+const shareTarget = ref<RecommendationItem | null>(null);
 
 interface FavoritePreviewItem {
   id: string;
@@ -1090,6 +1111,11 @@ const handleWishlist = async (item?: RecommendationItem | null) => {
       promptFeedback.value = "No pudimos añadir a tu wishlist.";
     }
   }
+};
+
+const handleShare = (item?: RecommendationItem | null) => {
+  if (!item) return;
+  shareTarget.value = item;
 };
 
 const openRecommendationDetails = (item: RecommendationItem) => {

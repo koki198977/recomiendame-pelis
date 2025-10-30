@@ -115,6 +115,13 @@
         >
           ⭐ En wishlist
         </span>
+        <button
+          v-if="item.tmdbId"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-primary-500/20 sm:w-auto sm:text-xs sm:py-1.5"
+          @click.stop="emit('share', item)"
+        >
+          🔗 Compartir
+        </button>
       </div>
     </div>
   </div>
@@ -163,6 +170,7 @@ const emit = defineEmits<{
   (e: "mark-favorite", item: RecommendationCardItem): void;
   (e: "mark-seen", item: RecommendationCardItem): void;
   (e: "mark-wishlist", item: RecommendationCardItem): void;
+  (e: "share", item: RecommendationCardItem): void;
 }>();
 
 const imageSrc = computed(

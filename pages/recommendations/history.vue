@@ -98,6 +98,7 @@
                 @mark-favorite="(entry) => markFavorite(entry)"
                 @mark-seen="(entry) => markSeen(entry)"
                 @mark-wishlist="(entry) => markWishlist(entry)"
+                @share="openShare"
               />
             </article>
           </div>
@@ -231,6 +232,13 @@
                   >
                     ▶️ Ver trailer
                   </a>
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="activeRecommendation ? openShare(activeRecommendation) : null"
+                  >
+                    🔗 Compartir
+                  </button>
                 </div>
               </div>
             </div>
@@ -238,12 +246,18 @@
         </div>
       </transition>
     </Teleport>
+    <ShareDialog
+      :item="shareTarget"
+      :show="Boolean(shareTarget)"
+      @close="closeShare"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
 import RecommendationCard from "~/components/RecommendationCard.vue";
+import ShareDialog from "~/components/ShareDialog.vue";
 import { useAuthToken, syncAuthState } from "~/composables/useAuthState";
 import { useCollections } from "~/composables/useCollections";
 
@@ -282,9 +296,9 @@ const filters = reactive({
 
 const searchDraft = ref("");
 const searchDebounce = ref<ReturnType<typeof setTimeout> | null>(null);
-
 const activeRecommendation = ref<HistoryItem | null>(null);
 const modalContainer = ref<HTMLDivElement | null>(null);
+const shareTarget = ref<HistoryItem | null>(null);
 
 const placeholderImage = "https://placehold.co/200x300/1A0F59/FFFFFF?text=Recomiendame";
 
@@ -415,6 +429,14 @@ const openDetails = (item: HistoryItem) => {
 
 const closeDetails = () => {
   activeRecommendation.value = null;
+};
+
+const openShare = (item: HistoryItem) => {
+  shareTarget.value = item;
+};
+
+const closeShare = () => {
+  shareTarget.value = null;
 };
 
 const getStates = (item?: HistoryItem | null) => ({
