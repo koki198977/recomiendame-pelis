@@ -140,13 +140,13 @@
         <div
           v-if="activeRecommendation"
           ref="modalContainer"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/90 px-4 py-10 backdrop-blur-md"
+          class="fixed inset-0 z-[998] flex items-center justify-center bg-surface-950/90 px-4 py-10 backdrop-blur-md"
           tabindex="-1"
-          @keydown.esc="closeDetails"
-          @click.self="closeDetails"
+          @click="handleBackdropClick"
         >
           <div
             class="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] overflow-y-auto"
+            @click.stop
           >
             <button
               type="button"
@@ -247,7 +247,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick } from "vue";
+import { nextTick, onBeforeUnmount } from "vue";
 import RecommendationCard from "~/components/RecommendationCard.vue";
 import ShareDialog from "~/components/ShareDialog.vue";
 import {
@@ -482,6 +482,18 @@ const closeDetails = () => {
   activeRecommendation.value = null;
 };
 
+const handleBackdropClick = (event: MouseEvent) => {
+  if (event.target === event.currentTarget) {
+    closeDetails();
+  }
+};
+
+const handleEscapeKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && activeRecommendation.value) {
+    closeDetails();
+  }
+};
+
 const openShare = (item: RecommendationItem) => {
   shareTarget.value = item;
 };
@@ -513,8 +525,25 @@ useHead({
 });
 
 watch(activeRecommendation, (value) => {
-  if (value) {
-    nextTick(() => modalContainer.value?.focus());
+  if (process.client) {
+    if (value) {
+      // Prevenir scroll del body y agregar listener de escape
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleEscapeKey);
+      nextTick(() => modalContainer.value?.focus());
+    } else {
+      // Restaurar scroll del body y remover listener
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleEscapeKey);
+    }
+  }
+});
+
+// Cleanup al desmontar el componente
+onBeforeUnmount(() => {
+  if (process.client) {
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleEscapeKey);
   }
 });
 </script>

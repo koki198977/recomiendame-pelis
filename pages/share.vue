@@ -13,19 +13,13 @@
       </header>
 
       <section class="grid gap-8 lg:grid-cols-[320px_1fr]">
-        <div class="overflow-hidden rounded-[32px] border border-white/10 bg-white/5">
+        <div class="overflow-hidden rounded-[32px] border border-white/10 bg-white/5 aspect-[2/3]">
           <img :src="posterSrc" :alt="title" class="h-full w-full object-cover" />
         </div>
         <div class="space-y-6">
           <div class="space-y-3">
             <p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/40">
               {{ mediaTypeLabel }}
-            </p>
-            <p v-if="tmdbLink" class="text-sm text-white/60">
-              Consulta detalles oficiales en
-              <a :href="tmdbLink" target="_blank" rel="noopener" class="text-primary-300 underline decoration-dotted">
-                TheMovieDB
-              </a>
             </p>
             <p class="text-sm text-white/70">
               Genera tu propio perfil y recibe recomendaciones personalizadas en segundos.
@@ -109,11 +103,27 @@ const mediaTypeLabel = computed(() => {
 const posterSrc = computed(() => {
   const poster = rawPoster.value;
   if (!poster) return placeholder;
+  
+  // Si ya es una URL completa, usarla directamente
+  if (poster.startsWith('http')) {
+    try {
+      const parsed = new URL(poster);
+      if (parsed.hostname === "image.tmdb.org") {
+        // En desarrollo usar proxy local, en producción usar proxy público
+        if (process.client && window.location.hostname === "localhost") {
+          return `${origin}/api/image-proxy?url=${encodeURIComponent(parsed.toString())}`;
+        }
+        return `https://api.allorigins.win/raw?url=${encodeURIComponent(parsed.toString())}`;
+      }
+      return parsed.toString();
+    } catch {
+      return placeholder;
+    }
+  }
+  
+  // Si no es URL completa, intentar construirla
   try {
     const parsed = new URL(poster, origin);
-    if (parsed.hostname === "image.tmdb.org") {
-      return `${origin}/api/image-proxy?url=${encodeURIComponent(parsed.toString())}`;
-    }
     return parsed.toString();
   } catch {
     return placeholder;

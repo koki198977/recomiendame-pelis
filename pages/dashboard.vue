@@ -304,13 +304,13 @@
         <div
           v-if="activeRecommendation"
           ref="modalContainer"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/90 px-4 py-10 backdrop-blur-md"
+          class="fixed inset-0 z-[998] flex items-center justify-center bg-surface-950/90 px-4 py-10 backdrop-blur-md"
           tabindex="-1"
-          @keydown.esc="closeRecommendationDetails"
-          @click.self="closeRecommendationDetails"
+          @click="handleBackdropClick"
         >
           <div
             class="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] overflow-y-auto"
+            @click.stop
           >
             <button
               type="button"
@@ -548,7 +548,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch, nextTick, onMounted } from "vue";
+import { computed, reactive, ref, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
 import ShareDialog from "~/components/ShareDialog.vue";
 import {
   useAuthToken,
@@ -1126,6 +1126,18 @@ const closeRecommendationDetails = () => {
   activeRecommendation.value = null;
 };
 
+const handleBackdropClick = (event: MouseEvent) => {
+  if (event.target === event.currentTarget) {
+    closeRecommendationDetails();
+  }
+};
+
+const handleEscapeKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && activeRecommendation.value) {
+    closeRecommendationDetails();
+  }
+};
+
 onMounted(() => {
   if (process.client) {
     syncAuthState();
@@ -1141,10 +1153,19 @@ onMounted(() => {
 });
 
 watch(activeRecommendation, (value) => {
-  if (value) {
-    nextTick(() => {
-      modalContainer.value?.focus();
-    });
+  if (process.client) {
+    if (value) {
+      // Prevenir scroll del body y agregar listener de escape
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleEscapeKey);
+      nextTick(() => {
+        modalContainer.value?.focus();
+      });
+    } else {
+      // Restaurar scroll del body y remover listener
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleEscapeKey);
+    }
   }
 });
 
@@ -1170,6 +1191,14 @@ watch(authToken, (token) => {
     seenPreview.value = [];
     topRecommendations.value = [];
     activeRecommendation.value = null;
+  }
+});
+
+// Cleanup al desmontar el componente
+onBeforeUnmount(() => {
+  if (process.client) {
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleEscapeKey);
   }
 });
 
