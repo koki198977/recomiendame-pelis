@@ -345,7 +345,7 @@ const canUseShare = computed(
 );
 
 const handleEscapeKey = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && props.show) {
+  if (event.key === "Escape" && props.show) {
     handleClose();
   }
 };
@@ -356,14 +356,14 @@ watch(
     if (!process.client) return;
     if (show && props.item) {
       // Prevenir scroll del body y agregar listener de escape
-      document.body.style.overflow = 'hidden';
-      document.addEventListener('keydown', handleEscapeKey);
+      document.body.style.overflow = "hidden";
+      document.addEventListener("keydown", handleEscapeKey);
       await nextTick();
       await ensureShareImage();
     } else {
       // Restaurar scroll del body y remover listener
-      document.body.style.overflow = '';
-      document.removeEventListener('keydown', handleEscapeKey);
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleEscapeKey);
       resetPreview();
     }
   },
@@ -969,8 +969,8 @@ const slugify = (value: string) =>
 // Cleanup al desmontar el componente
 onBeforeUnmount(() => {
   if (process.client) {
-    document.body.style.overflow = '';
-    document.removeEventListener('keydown', handleEscapeKey);
+    document.body.style.overflow = "";
+    document.removeEventListener("keydown", handleEscapeKey);
   }
 });
 </script>
