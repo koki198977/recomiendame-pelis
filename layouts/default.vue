@@ -251,6 +251,7 @@ const isAuthenticated = computed(() => Boolean(tokenState.value));
 const authenticatedNav = [
   { to: '/dashboard', label: 'Inicio' },
   { to: '/recommendations', label: 'Recomendaciones' },
+  { to: '/recommendations/history', label: 'Historial' },
   { to: '/seen', label: 'Vistos' },
   { to: '/favorites', label: 'Favoritos' },
   { to: '/wishlist', label: 'Wishlist' },

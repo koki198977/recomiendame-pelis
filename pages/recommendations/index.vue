@@ -97,6 +97,12 @@
             {{ recommendations.length }} recomendaciones generadas
             <span v-if="lastUpdated"> · actualizadas {{ lastUpdated }}</span>
           </p>
+          <NuxtLink
+            to="/recommendations/history"
+            class="inline-flex items-center gap-2 text-xs font-semibold text-primary-200 hover:text-primary-100 transition"
+          >
+            Ver historial completo →
+          </NuxtLink>
         </div>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <article
