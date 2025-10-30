@@ -19,9 +19,7 @@
           {{ formattedDate }}
         </span>
       </div>
-      <p v-if="item.overview" class="text-sm leading-relaxed text-white/60">
-        {{ item.overview }}
-      </p>
+      
       <div v-if="platforms.length" class="flex flex-wrap gap-2">
         <span
           v-for="platform in platforms"
@@ -31,16 +29,33 @@
           {{ platform }}
         </span>
       </div>
-      <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
+
+      <div v-if="item.overview" class="space-y-2">
+        <p v-if="!showFullOverview" class="text-sm leading-relaxed text-white/60 line-clamp-3">
+          {{ item.overview }}
+        </p>
+        <p v-else class="text-sm leading-relaxed text-white/60">
+          {{ item.overview }}
+        </p>
+        <button
+          v-if="item.overview && item.overview.length > 150"
+          class="text-xs font-semibold text-primary-200 hover:text-primary-100 transition"
+          @click="showFullOverview = !showFullOverview"
+        >
+          {{ showFullOverview ? 'Ver menos' : 'Ver más' }}
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-2 pt-2 border-t border-white/10">
         <button
           v-if="item.tmdbId"
-          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-primary-500/20 sm:w-auto sm:text-xs sm:py-1.5"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-primary-500/20"
           @click="$emit('share', item)"
         >
           🔗 Compartir
         </button>
         <button
-          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-500/20 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40 sm:w-auto sm:text-xs sm:py-1.5"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-500/20 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40"
           :disabled="deleting"
           @click="$emit('remove')"
         >
@@ -95,6 +110,8 @@ defineEmits<{
   (e: "remove"): void;
   (e: "share", item: FavoriteItem): void;
 }>();
+
+const showFullOverview = ref(false);
 
 const posterSrc = computed(
   () =>

@@ -67,6 +67,7 @@
               :item="item"
               :deleting="deletingId === String(item.recordId ?? item.tmdbId)"
               @remove="handleRemove(item)"
+              @share="handleShare(item)"
             />
           </div>
         </div>
@@ -231,6 +232,12 @@
         </div>
       </div>
     </transition>
+
+    <ShareDialog
+      :item="shareTarget"
+      :show="Boolean(shareTarget)"
+      @close="shareTarget = null"
+    />
   </div>
 </template>
 
@@ -238,6 +245,7 @@
 import { useAuthToken, syncAuthState } from "~/composables/useAuthState";
 import { useCollections } from "~/composables/useCollections";
 import FavoriteCard from "~/components/FavoriteCard.vue";
+import ShareDialog from "~/components/ShareDialog.vue";
 
 interface FavoriteItem {
   id: string;
@@ -266,6 +274,7 @@ const addSearchResults = ref<any[]>([]);
 const addSearchLoading = ref(false);
 const addSearchError = ref("");
 const addInProgress = ref<number | null>(null);
+const shareTarget = ref<FavoriteItem | null>(null);
 
 const filters = reactive({
   search: "",
@@ -424,6 +433,10 @@ const handleRemove = async (item: FavoriteItem) => {
 
 const syncCollections = async () => {
   await collections.ensureLoaded();
+};
+
+const handleShare = (item: FavoriteItem) => {
+  shareTarget.value = item;
 };
 
 const openAddModal = () => {

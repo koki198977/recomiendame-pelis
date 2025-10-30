@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import brandLogo from "~/assets/logo.png?url";
 
 const route = useRoute();
@@ -150,29 +150,109 @@ const decodedPoster = computed(() => {
 
 const displayPoster = ref<string>(placeholder);
 const fallbackTried = ref(false);
+const isGeneratingPoster = ref(false);
 
 const isTmdbUrl = (value: string) =>
   /^https?:\/\/image\.tmdb\.org\/.+/i.test(value);
 
-const updatePoster = () => {
+const generateSharePoster = async () => {
+  if (!process.client || !decodedPoster.value || !title.value) return;
+
+  isGeneratingPoster.value = true;
+
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = 600;
+    canvas.height = 900;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // Fondo
+    const gradient = ctx.createLinearGradient(0, 0, 600, 900);
+    gradient.addColorStop(0, "#140836");
+    gradient.addColorStop(0.4, "#1b0f3f");
+    gradient.addColorStop(1, "#0f0b2d");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 600, 900);
+
+    // Cargar poster
+    let posterImg: HTMLImageElement;
+    try {
+      posterImg = await loadImage(decodedPoster.value);
+    } catch {
+      // Si falla, usar placeholder
+      posterImg = await loadImage(placeholder);
+    }
+
+    // Dibujar poster
+    const posterWidth = 400;
+    const posterHeight = 600;
+    const posterX = (600 - posterWidth) / 2;
+    const posterY = 50;
+
+    ctx.drawImage(posterImg, posterX, posterY, posterWidth, posterHeight);
+
+    // Título
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "bold 32px Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(title.value, 300, 700);
+
+    // Tipo de contenido
+    ctx.fillStyle = "#A855F7";
+    ctx.font = "600 18px Arial, sans-serif";
+    ctx.fillText(mediaTypeLabel.value, 300, 730);
+
+    // Logo/marca
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "600 24px Arial, sans-serif";
+    ctx.fillText("Recomiéndame", 300, 850);
+
+    displayPoster.value = canvas.toDataURL("image/png", 0.9);
+  } catch (error) {
+    console.error("Error generando poster:", error);
+    displayPoster.value = placeholder;
+  } finally {
+    isGeneratingPoster.value = false;
+  }
+};
+
+const loadImage = (src: string): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+
+    // Si es TMDB, usar proxy
+    if (isTmdbUrl(src)) {
+      img.src = `https://api.allorigins.win/raw?url=${encodeURIComponent(src)}`;
+    } else {
+      img.src = src;
+    }
+  });
+};
+
+const updatePoster = async () => {
   fallbackTried.value = false;
   const poster = decodedPoster.value;
+
   if (!poster) {
     displayPoster.value = placeholder;
     return;
   }
 
-  // Si es una URL de TMDB, usar proxy desde el inicio
-  if (isTmdbUrl(poster)) {
-    displayPoster.value = `https://api.allorigins.win/raw?url=${encodeURIComponent(
-      poster
-    )}`;
-  } else {
-    displayPoster.value = poster;
-  }
+  // Generar poster personalizado
+  await generateSharePoster();
 };
 
-watch(decodedPoster, updatePoster, { immediate: true });
+watch(decodedPoster, updatePoster, { immediate: false });
+
+onMounted(() => {
+  if (decodedPoster.value) {
+    updatePoster();
+  }
+});
 
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement;
