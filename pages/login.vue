@@ -116,7 +116,6 @@ const isSubmitting = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 
-const router = useRouter();
 const config = useRuntimeConfig();
 const authToken = useAuthToken();
 const authUser = useAuthUser();
@@ -167,9 +166,7 @@ const handleSubmit = async () => {
     }
 
     successMessage.value = "Acceso concedido. Redirigiendo…";
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 800);
+    await navigateTo("/dashboard");
   } catch (error) {
     const message =
       error?.data?.message ||

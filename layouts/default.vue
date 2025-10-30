@@ -110,18 +110,21 @@
               <NuxtLink
                 to="/features"
                 class="text-white/70 hover:text-white transition"
+                @click="mobileMenuOpen = false"
               >
                 Funcionalidades
               </NuxtLink>
               <NuxtLink
                 to="/download"
                 class="text-white/70 hover:text-white transition"
+                @click="mobileMenuOpen = false"
               >
                 Apps móviles
               </NuxtLink>
               <NuxtLink
                 to="/login"
                 class="inline-flex items-center justify-center rounded-full bg-primary-500 px-4 py-2 font-semibold shadow-soft hover:bg-primary-400 transition"
+                @click="mobileMenuOpen = false"
               >
                 Ingresar
               </NuxtLink>
@@ -288,4 +291,20 @@ onBeforeUnmount(() => {
   if (!process.client) return;
   window.removeEventListener('storage', syncAuthState);
 });
+
+watch(
+  () => route.fullPath,
+  () => {
+    mobileMenuOpen.value = false;
+  }
+);
+
+watch(
+  () => tokenState.value,
+  (val) => {
+    if (val) {
+      mobileMenuOpen.value = false;
+    }
+  }
+);
 </script>
