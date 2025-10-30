@@ -161,7 +161,15 @@ const updatePoster = () => {
     displayPoster.value = placeholder;
     return;
   }
-  displayPoster.value = poster;
+
+  // Si es una URL de TMDB, usar proxy desde el inicio
+  if (isTmdbUrl(poster)) {
+    displayPoster.value = `https://api.allorigins.win/raw?url=${encodeURIComponent(
+      poster
+    )}`;
+  } else {
+    displayPoster.value = poster;
+  }
 };
 
 watch(decodedPoster, updatePoster, { immediate: true });
@@ -169,11 +177,14 @@ watch(decodedPoster, updatePoster, { immediate: true });
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement;
   const poster = decodedPoster.value;
+
   if (!fallbackTried.value && poster && isTmdbUrl(poster)) {
     fallbackTried.value = true;
+    // Intentar con el proxy local como fallback
     img.src = `${origin}/api/image-proxy?url=${encodeURIComponent(poster)}`;
     return;
   }
+
   if (img.src !== placeholder) {
     console.warn("Error cargando imagen:", img.src);
     img.src = placeholder;
