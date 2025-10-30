@@ -4,12 +4,12 @@
       <div
         v-if="show && item"
         class="fixed inset-0 z-[999] flex items-center justify-center bg-surface-950/90 px-4 py-6 backdrop-blur-md sm:px-6 sm:py-10"
-        @click.self="handleClose"
-        @keydown.esc="handleClose"
+        @click="handleBackdropClick"
         tabindex="-1"
       >
         <div
           class="relative flex w-full max-w-[min(100vw-1.5rem,420px)] flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] sm:max-w-2xl lg:max-w-4xl"
+          @click.stop
         >
           <button
             class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
@@ -222,6 +222,7 @@
 </template>
 
 <script setup lang="ts">
+import { onBeforeUnmount } from "vue";
 import brandLogo from "~/assets/logo.png?url";
 
 const props = defineProps<{
@@ -343,14 +344,26 @@ const canUseShare = computed(
   () => typeof navigator !== "undefined" && !!navigator.share
 );
 
+const handleEscapeKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && props.show) {
+    handleClose();
+  }
+};
+
 watch(
   () => [props.show, props.item?.tmdbId],
   async ([show]) => {
     if (!process.client) return;
     if (show && props.item) {
+      // Prevenir scroll del body y agregar listener de escape
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleEscapeKey);
       await nextTick();
       await ensureShareImage();
     } else {
+      // Restaurar scroll del body y remover listener
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', handleEscapeKey);
       resetPreview();
     }
   },
@@ -361,6 +374,12 @@ const handleClose = () => {
   feedbackMessage.value = "";
   resetPreview();
   emit("close");
+};
+
+const handleBackdropClick = (event: MouseEvent) => {
+  if (event.target === event.currentTarget) {
+    handleClose();
+  }
 };
 
 const openWindow = (url: string) => {
@@ -946,6 +965,14 @@ const slugify = (value: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
+
+// Cleanup al desmontar el componente
+onBeforeUnmount(() => {
+  if (process.client) {
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', handleEscapeKey);
+  }
+});
 </script>
 
 <style scoped>

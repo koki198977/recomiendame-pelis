@@ -143,12 +143,14 @@
         <div
           v-if="activeRecommendation"
           ref="modalContainer"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/90 px-4 py-6 sm:px-6 sm:py-10 backdrop-blur-md"
+          class="fixed inset-0 z-[998] flex items-center justify-center bg-surface-950/90 px-4 py-6 sm:px-6 sm:py-10 backdrop-blur-md"
           tabindex="-1"
-          @keydown.esc="closeDetails"
-          @click.self="closeDetails"
+          @click="handleBackdropClick"
         >
-          <div class="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[92vh]">
+          <div 
+            class="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[92vh]"
+            @click.stop
+          >
             <button
               type="button"
               class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
@@ -440,6 +442,18 @@ const closeDetails = () => {
   activeRecommendation.value = null;
 };
 
+const handleBackdropClick = (event: MouseEvent) => {
+  if (event.target === event.currentTarget) {
+    closeDetails();
+  }
+};
+
+const handleEscapeKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && activeRecommendation.value) {
+    closeDetails();
+  }
+};
+
 const openShare = (item: HistoryItem) => {
   shareTarget.value = item;
 };
@@ -495,6 +509,9 @@ onMounted(() => {
     syncAuthState();
     collections.ensureLoaded();
     fetchHistory();
+    
+    // Agregar listener global para escape
+    document.addEventListener('keydown', handleEscapeKey);
   }
 });
 
@@ -514,8 +531,15 @@ watch(authToken, (token) => {
 });
 
 watch(activeRecommendation, (value) => {
-  if (value) {
-    nextTick(() => modalContainer.value?.focus());
+  if (process.client) {
+    if (value) {
+      // Prevenir scroll del body
+      document.body.style.overflow = 'hidden';
+      nextTick(() => modalContainer.value?.focus());
+    } else {
+      // Restaurar scroll del body
+      document.body.style.overflow = '';
+    }
   }
 });
 
@@ -545,6 +569,11 @@ watch(searchDraft, (value) => {
 onBeforeUnmount(() => {
   if (searchDebounce.value) {
     clearTimeout(searchDebounce.value);
+  }
+  
+  // Remover listener global
+  if (process.client) {
+    document.removeEventListener('keydown', handleEscapeKey);
   }
 });
 
