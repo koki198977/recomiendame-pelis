@@ -109,11 +109,8 @@ const posterSrc = computed(() => {
     try {
       const parsed = new URL(poster);
       if (parsed.hostname === "image.tmdb.org") {
-        // En desarrollo usar proxy local, en producción usar proxy público
-        if (process.client && window.location.hostname === "localhost") {
-          return `${origin}/api/image-proxy?url=${encodeURIComponent(parsed.toString())}`;
-        }
-        return `https://api.allorigins.win/raw?url=${encodeURIComponent(parsed.toString())}`;
+        // Usar directamente la URL de TMDB sin proxy para evitar problemas CORS
+        return parsed.toString();
       }
       return parsed.toString();
     } catch {

@@ -292,8 +292,8 @@ const resolvePosterSource = (src?: string | null) => {
           parsed.toString()
         )}`;
       }
-      // En producción, devolver la primera opción de proxy
-      return getProxyUrls(parsed.toString())[0];
+      // En producción, intentar usar la URL directa primero
+      return parsed.toString();
     }
     return parsed.toString();
   } catch {
@@ -896,7 +896,21 @@ const loadImage = async (
       throw originalError;
     }
 
-    // Intentar con fetch y retry
+    // Si es una URL de TMDB y falló, intentar con proxies
+    if (src.includes("image.tmdb.org")) {
+      const proxyUrls = getProxyUrls(src);
+
+      for (let i = 0; i < proxyUrls.length; i++) {
+        try {
+          console.log(`Intentando proxy ${i + 1}:`, proxyUrls[i]);
+          return await createImage(proxyUrls[i]);
+        } catch (proxyError) {
+          console.warn(`Proxy ${i + 1} falló:`, proxyError);
+        }
+      }
+    }
+
+    // Intentar con fetch y retry para otras URLs
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         console.log(`Intento ${attempt + 1} de ${retries + 1} para:`, src);
