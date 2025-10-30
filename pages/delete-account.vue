@@ -62,8 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-
 const route = useRoute();
 const token = route.query.token as string | undefined;
 
@@ -71,15 +69,6 @@ const config = useRuntimeConfig();
 const loading = ref(false);
 const error = ref("");
 const success = ref(false);
-const confirmUrl = computed(() => {
-  const provided = config.public?.deleteAccountConfirmUrl;
-  if (provided?.startsWith("http")) {
-    return provided;
-  }
-  const base =
-    typeof window !== "undefined" ? window.location.origin : config.public.apiBase;
-  return `${base}${provided || "/delete-account/confirm"}`;
-});
 
 const handleDelete = async () => {
   if (!token) {
@@ -91,9 +80,13 @@ const handleDelete = async () => {
   error.value = "";
 
   try {
-    await $fetch(confirmUrl.value, {
-      method: "GET",
-      query: { token },
+    await $fetch("/auth/delete-account", {
+      baseURL: config.public.apiBase,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: { token },
     });
     success.value = true;
   } catch (err: any) {

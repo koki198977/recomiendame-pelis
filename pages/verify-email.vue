@@ -124,7 +124,7 @@ const verifyToken = async (token: string) => {
   status.value = "verifying";
 
   try {
-    await $fetch("/auth/verify-email", {
+    await $fetch("/users/verify-email", {
       baseURL: config.public.apiBase,
       method: "GET",
       query: { token },
