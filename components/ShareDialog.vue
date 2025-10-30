@@ -101,15 +101,24 @@
                 </button>
                 <button
                   class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                  @click="shareInstagram"
+                >
+                  <img src="/social/instagram.svg" alt="" class="h-4 w-4" />
+                  Instagram
+                </button>
+                <button
+                  class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
                   @click="shareWhatsapp"
                 >
-                  💬 WhatsApp
+                  <img src="/social/whatsapp.svg" alt="" class="h-4 w-4" />
+                  WhatsApp
                 </button>
                 <button
                   class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
                   @click="shareFacebook"
                 >
-                  📘 Facebook
+                  <img src="/social/facebook.svg" alt="" class="h-4 w-4" />
+                  Facebook
                 </button>
                 <button
                   class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
@@ -167,28 +176,50 @@ const emit = defineEmits<{
 }>();
 
 const placeholderImage =
-  "https://placehold.co/400x600/1A0F59/FFFFFF?text=Recomiendame";
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MDAgNjAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjMWEwZjU5Ii8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjMmIyMDZkIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSI2MDAiIGZpbGw9InVybCgjZykiLz48ZWxsaXBzZSBjeD0iMzIwIiBjeT0iODAiIHJ4PSIxMjAiIHJ5PSIxMjAiIGZpbGw9InJnYmEoMTY4LDg1LDI0NywwLjI1KSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTUlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MiIgZmlsbD0iI2ZmZmZmZiIgb3BhY2l0eT0iMC44OCI+UmVjb21pZW5kYW1lPC90ZXh0Pjx0ZXh0IHg9IjUwJSIgeT0iNjUlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZmlsbD0iI2MwODRmYyIgb3BhY2l0eT0iMC43OCI+VHVzIHByb3hpbWFzIGhpc3RvcmlhczwvdGV4dD48L3N2Zz4=";
 
 const feedbackMessage = ref("");
 const sharePreviewUrl = ref<string | null>(null);
 const isGeneratingPreview = ref(false);
 const shareError = ref("");
+const generatedObjectUrls: string[] = [];
 
 const siteOrigin = computed(() =>
   typeof window !== "undefined" ? window.location.origin : "https://recomiendameapp.cl"
 );
 
-const shareUrl = computed(() => {
-  if (props.shareUrl) return props.shareUrl;
+const TMDB_HOSTS = ["image.tmdb.org"];
+
+const resolvePosterSource = (src?: string | null) => {
+  if (!src) return placeholderImage;
+  if (src.startsWith("data:")) return src;
+  try {
+    const parsed = new URL(
+      src,
+      typeof window !== "undefined" ? window.location.origin : "https://recomiendameapp.cl"
+    );
+    if (TMDB_HOSTS.includes(parsed.hostname)) {
+      return `/api/image-proxy?url=${encodeURIComponent(parsed.toString())}`;
+    }
+    return parsed.toString();
+  } catch {
+    return src;
+  }
+};
+
+const tmdbUrl = computed(() => {
   if (props.item?.tmdbId && props.item?.mediaType) {
     return `https://www.themoviedb.org/${props.item.mediaType === "tv" ? "tv" : "movie"}/${props.item.tmdbId}`;
   }
-  return siteOrigin.value;
+  return "";
 });
+
+const shareUrl = computed(() => props.shareUrl || siteOrigin.value);
 
 const shareMessage = computed(() => {
   const strongPitch = `Recomiéndame me sugirió "${props.item?.title}"`;
-  return `${strongPitch}. \nDescubre tus próximas películas y series en ${siteOrigin.value}.`;
+  const tmdbReference = tmdbUrl.value ? `\nMira los detalles en TMDB: ${tmdbUrl.value}` : "";
+  return `${strongPitch}.\nDescubre tus próximas películas y series en ${siteOrigin.value}.${tmdbReference}`;
 });
 
 const canUseShare = computed(() => typeof navigator !== "undefined" && !!navigator.share);
@@ -220,7 +251,7 @@ const openWindow = (url: string) => {
 };
 
 const shareWhatsapp = () => {
-  const url = `https://wa.me/?text=${encodeURIComponent(`${shareMessage.value}\n${shareUrl.value}`)}`;
+  const url = `https://wa.me/?text=${encodeURIComponent(shareMessage.value)}`;
   openWindow(url);
 };
 
@@ -237,7 +268,7 @@ const shareTwitter = () => {
 const copyLink = async () => {
   if (!process.client) return;
   try {
-    await navigator.clipboard.writeText(`${shareMessage.value}\n${shareUrl.value}`);
+    await navigator.clipboard.writeText(shareMessage.value);
     feedbackMessage.value = "Enlace copiado al portapapeles.";
   } catch {
     feedbackMessage.value = "No pudimos copiar el enlace automáticamente.";
@@ -291,6 +322,7 @@ function resetPreview() {
   sharePreviewUrl.value = null;
   isGeneratingPreview.value = false;
   shareError.value = "";
+  generatedObjectUrls.splice(0).forEach((url) => URL.revokeObjectURL(url));
 }
 
 const downloadShareImage = async () => {
@@ -322,10 +354,47 @@ const copyImage = async () => {
     }
     const blob = await (await fetch(imageUrl)).blob();
     await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
-    feedbackMessage.value = "Imagen copiada al portapapeles.";
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(shareMessage.value);
+    }
+    feedbackMessage.value = "Imagen copiada. También pegamos el mensaje recomendado.";
   } catch {
     feedbackMessage.value = "No pudimos copiar la imagen automáticamente.";
   }
+};
+
+const shareInstagram = async () => {
+  if (!process.client) return;
+  const imageUrl = await ensureShareImage();
+  if (!imageUrl) {
+    feedbackMessage.value = "No hay imagen disponible para compartir.";
+    return;
+  }
+
+  if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+    try {
+      const blob = await (await fetch(imageUrl)).blob();
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareMessage.value);
+      }
+      if (process.client) {
+        window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+      }
+      feedbackMessage.value =
+        "Imagen y texto copiados. Abre Instagram y pégalos en tus historias o publicaciones.";
+      return;
+    } catch (error) {
+      console.warn("No se pudo copiar la imagen para Instagram:", error);
+    }
+  }
+
+  await downloadShareImage();
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(shareMessage.value);
+  }
+  feedbackMessage.value =
+    "Descargamos la imagen y copiamos el texto. Súbela en Instagram y pega el mensaje.";
 };
 
 const generateShareImage = async (item: NonNullable<typeof props.item>) => {
@@ -361,7 +430,14 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
       context.fill();
     }
 
-    const poster = await loadImage(item.posterUrl || placeholderImage);
+    let poster: HTMLImageElement;
+    const source = resolvePosterSource(item.posterUrl);
+    try {
+      poster = await loadImage(source);
+    } catch (posterError) {
+      console.warn("Fallo al cargar poster remoto, usando placeholder:", posterError);
+      poster = await loadImage(placeholderImage);
+    }
     const posterAreaWidth = width - margin * 2;
     const posterAreaHeight = height * 0.58;
     let posterWidth = posterAreaWidth;
@@ -456,7 +532,8 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
 
     sharePreviewUrl.value = canvas.toDataURL("image/png", 0.92);
   } catch (error) {
-    shareError.value = "No pudimos generar la imagen en este momento.";
+    shareError.value =
+      "No pudimos generar la imagen personalizada. Usa los botones de compartir directo o descarga el póster manualmente.";
     console.error("No se pudo generar la imagen para compartir:", error);
   } finally {
     isGeneratingPreview.value = false;
@@ -559,9 +636,31 @@ const drawRatingBadge = (
 };
 
 const loadImage = (src: string) =>
+  createImage(src).catch(async (originalError) => {
+    if (!process.client) throw originalError;
+    try {
+      const response = await fetch(src, {
+        mode: "cors",
+        referrerPolicy: "no-referrer",
+      });
+      if (!response.ok) {
+        throw new Error(`Respuesta inválida (${response.status})`);
+      }
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      generatedObjectUrls.push(objectUrl);
+      return await createImage(objectUrl);
+    } catch (error) {
+      console.error("No se pudo cargar la imagen remota:", error);
+      throw originalError;
+    }
+  });
+
+const createImage = (src: string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
+    img.referrerPolicy = "no-referrer";
     img.onload = () => resolve(img);
     img.onerror = () => reject(new Error(`No se pudo cargar la imagen: ${src}`));
     img.src = src;
