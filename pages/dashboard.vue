@@ -204,19 +204,202 @@
           </p>
         </div>
       </header>
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <RecommendationCard
+      <div v-if="topRecommendations.length" class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <article
           v-for="item in topRecommendations"
-          :key="item.title"
-          :item="item"
-          :states="itemStates(item)"
-          :show-actions="true"
-          @mark-favorite="handleFavorite"
-          @mark-seen="handleSeen"
-          @mark-wishlist="handleWishlist"
-        />
+          :key="item.id || `${item.tmdbId}-${item.mediaType}` || item.title"
+          class="card flex h-full cursor-pointer flex-col gap-4 p-0 overflow-hidden transition hover:-translate-y-1 hover:shadow-medium"
+          @click="openRecommendationDetails(item)"
+        >
+          <div class="relative w-full">
+            <div class="relative mx-4 mt-4 overflow-hidden rounded-3xl border border-white/5">
+              <div class="aspect-[2/3]">
+                <img
+                  :src="item.posterUrl || placeholderImage"
+                  :alt="item.title"
+                  class="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-1 flex-col gap-3 px-6 pb-6">
+            <div>
+              <p class="text-xs uppercase tracking-[0.3em] text-white/40">
+                {{ item.mediaType === "tv" ? "Serie" : "Película" }}
+              </p>
+              <h3 class="mt-1 text-lg font-semibold line-clamp-2" :title="item.title">
+                {{ item.title }}
+              </h3>
+            </div>
+            <div class="flex items-center justify-between text-xs text-white/60">
+              <span class="inline-flex items-center gap-1 text-primary-100">
+                ⭐
+                <span class="font-semibold text-white">
+                  {{ formatVoteAverage(item.voteAverage) }}
+                </span>
+              </span>
+              <span>{{ formatReleaseLabel(item.releaseDate) }}</span>
+            </div>
+            <div v-if="item.platforms?.length" class="flex flex-wrap gap-2">
+              <span
+                v-for="platform in item.platforms"
+                :key="platform"
+                class="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70"
+              >
+                {{ platform }}
+              </span>
+            </div>
+            <div class="mt-auto grid gap-2">
+              <button
+                type="button"
+                :class="actionButtonClass(getItemStates(item).seen)"
+                :disabled="getItemStates(item).seen"
+                @click.stop="handleSeen(item)"
+              >
+                {{ getItemStates(item).seen ? "👀 Ya visto" : "👀 Marcar visto" }}
+              </button>
+              <button
+                type="button"
+                :class="actionButtonClass(getItemStates(item).favorite)"
+                :disabled="getItemStates(item).favorite"
+                @click.stop="handleFavorite(item)"
+              >
+                {{ getItemStates(item).favorite ? "❤️ En favoritos" : "❤️ Favorito" }}
+              </button>
+              <button
+                type="button"
+                :class="actionButtonClass(getItemStates(item).wishlist)"
+                :disabled="getItemStates(item).wishlist"
+                @click.stop="handleWishlist(item)"
+              >
+                {{ getItemStates(item).wishlist ? "⭐ En wishlist" : "⭐ Añadir a wishlist" }}
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div v-else class="card border border-dashed border-white/10 bg-white/5 p-10 text-center text-sm text-white/60">
+        Aún no tenemos recomendaciones destacadas. Genera una nueva búsqueda o guarda más favoritos
+        para afinar la IA.
       </div>
     </section>
+
+    <Teleport to="body">
+      <transition name="fade">
+        <div
+          v-if="activeRecommendation"
+          ref="modalContainer"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/90 px-4 py-10 backdrop-blur-md"
+          tabindex="-1"
+          @keydown.esc="closeRecommendationDetails"
+          @click.self="closeRecommendationDetails"
+        >
+          <div
+            class="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong"
+          >
+            <button
+              type="button"
+              class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
+              @click="closeRecommendationDetails"
+              aria-label="Cerrar detalles"
+            >
+              ✕
+            </button>
+            <div class="grid gap-6 p-8 md:grid-cols-[220px_1fr]">
+              <div class="overflow-hidden rounded-3xl border border-white/10">
+                <img
+                  :src="activeRecommendation?.posterUrl || placeholderImage"
+                  :alt="activeRecommendation?.title"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.3em] text-white/40">
+                    {{ activeRecommendation?.mediaType === "tv" ? "Serie" : "Película" }}
+                  </p>
+                  <h3 class="mt-2 text-2xl font-semibold">
+                    {{ activeRecommendation?.title }}
+                  </h3>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-white/70">
+                  <span class="inline-flex items-center gap-2 text-primary-100">
+                    ⭐
+                    <span class="font-semibold text-white text-lg">
+                      {{ formatVoteAverage(activeRecommendation?.voteAverage) }}
+                    </span>
+                  </span>
+                  <span>{{ formatReleaseLabel(activeRecommendation?.releaseDate) }}</span>
+                  <span v-if="activeRecommendation?.reason" class="text-xs uppercase tracking-[0.3em] text-white/40">
+                    {{ activeRecommendation.reason }}
+                  </span>
+                </div>
+                <p v-if="activeRecommendation?.overview" class="text-sm leading-relaxed text-white/80">
+                  {{ activeRecommendation.overview }}
+                </p>
+                <div v-if="activeRecommendation?.platforms?.length" class="flex flex-wrap gap-2">
+                  <span
+                    v-for="platform in activeRecommendation.platforms"
+                    :key="platform"
+                    class="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70"
+                  >
+                    {{ platform }}
+                  </span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    :class="actionButtonClass(getItemStates(activeRecommendation).seen)"
+                    :disabled="getItemStates(activeRecommendation).seen"
+                    @click="handleSeen(activeRecommendation)"
+                  >
+                    {{
+                      getItemStates(activeRecommendation).seen
+                        ? "👀 Ya visto"
+                        : "👀 Marcar visto"
+                    }}
+                  </button>
+                  <button
+                    type="button"
+                    :class="actionButtonClass(getItemStates(activeRecommendation).favorite)"
+                    :disabled="getItemStates(activeRecommendation).favorite"
+                    @click="handleFavorite(activeRecommendation)"
+                  >
+                    {{
+                      getItemStates(activeRecommendation).favorite
+                        ? "❤️ En favoritos"
+                        : "❤️ Favorito"
+                    }}
+                  </button>
+                  <button
+                    type="button"
+                    :class="actionButtonClass(getItemStates(activeRecommendation).wishlist)"
+                    :disabled="getItemStates(activeRecommendation).wishlist"
+                    @click="handleWishlist(activeRecommendation)"
+                  >
+                    {{
+                      getItemStates(activeRecommendation).wishlist
+                        ? "⭐ En wishlist"
+                        : "⭐ Añadir a wishlist"
+                    }}
+                  </button>
+                  <a
+                    v-if="activeRecommendation?.trailerUrl"
+                    :href="activeRecommendation.trailerUrl"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                  >
+                    ▶️ Ver trailer
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
 
     <!-- Favorites and Seen -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 grid gap-10 lg:grid-cols-2">
@@ -339,8 +522,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from "vue";
-import RecommendationCard from "~/components/RecommendationCard.vue";
+import { computed, reactive, ref, watch, nextTick } from "vue";
 import {
   useAuthToken,
   useAuthUser,
@@ -447,12 +629,41 @@ const promptChips = [
 
 const placeholderImage = "https://placehold.co/200x300/1A0F59/FFFFFF?text=Recomiendame";
 
+const formatVoteAverage = (vote?: number | null) => {
+  if (vote === undefined || vote === null || Number.isNaN(Number(vote))) {
+    return "—";
+  }
+  return Number(vote).toFixed(1);
+};
+
+const formatReleaseLabel = (date?: string) => {
+  if (!date) return "Estreno pendiente";
+  const dt = new Date(date);
+  if (Number.isNaN(dt.getTime())) return "Estreno pendiente";
+  const formatter = new Intl.DateTimeFormat("es-ES", {
+    month: "short",
+    year: "numeric",
+  });
+  const formatted = formatter.format(dt).replace(".", "").toLowerCase();
+  return `Estreno ${formatted}`;
+};
+
+const actionButtonClass = (isActive: boolean) =>
+  [
+    "w-full rounded-full border px-4 py-2 text-sm font-semibold transition",
+    isActive
+      ? "border-primary-400 bg-primary-500/20 text-primary-100"
+      : "border-white/10 bg-white/5 text-white/80 hover:bg-white/10",
+  ].join(" ");
+
 const authToken = useAuthToken();
 const authUser = useAuthUser();
 const config = useRuntimeConfig();
 const collections = useCollections();
 
 const topRecommendations = ref<RecommendationItem[]>([]);
+const activeRecommendation = ref<RecommendationItem | null>(null);
+const modalContainer = ref<HTMLDivElement | null>(null);
 
 interface FavoritePreviewItem {
   id: string;
@@ -810,6 +1021,9 @@ const itemStates = (item: RecommendationItem) => ({
   wishlist: collections.isInWishlist(item.tmdbId, item.mediaType),
 });
 
+const getItemStates = (item?: RecommendationItem | null) =>
+  item ? itemStates(item) : { favorite: false, seen: false, wishlist: false };
+
 const buildPayload = (item: RecommendationItem) => ({
   tmdbId: Number(item.tmdbId),
   mediaType: item.mediaType || "movie",
@@ -827,8 +1041,8 @@ const handlePrompt = async () => {
   await fetchRecommendations(value);
 };
 
-const handleFavorite = async (item: RecommendationItem) => {
-  if (!item.tmdbId) return;
+const handleFavorite = async (item?: RecommendationItem | null) => {
+  if (!item || !item.tmdbId) return;
   try {
     await collections.addFavorite(buildPayload(item));
     promptFeedback.value = "Agregado a favoritos.";
@@ -842,8 +1056,8 @@ const handleFavorite = async (item: RecommendationItem) => {
   }
 };
 
-const handleSeen = async (item: RecommendationItem) => {
-  if (!item.tmdbId) return;
+const handleSeen = async (item?: RecommendationItem | null) => {
+  if (!item || !item.tmdbId) return;
   try {
     await collections.addSeen(buildPayload(item));
     promptFeedback.value = "Marcado como visto.";
@@ -857,8 +1071,8 @@ const handleSeen = async (item: RecommendationItem) => {
   }
 };
 
-const handleWishlist = async (item: RecommendationItem) => {
-  if (!item.tmdbId) return;
+const handleWishlist = async (item?: RecommendationItem | null) => {
+  if (!item || !item.tmdbId) return;
   try {
     await collections.addWishlist(buildPayload(item));
     promptFeedback.value = "Añadido a tu wishlist.";
@@ -869,6 +1083,14 @@ const handleWishlist = async (item: RecommendationItem) => {
       promptFeedback.value = "No pudimos añadir a tu wishlist.";
     }
   }
+};
+
+const openRecommendationDetails = (item: RecommendationItem) => {
+  activeRecommendation.value = item;
+};
+
+const closeRecommendationDetails = () => {
+  activeRecommendation.value = null;
 };
 
 onMounted(() => {
@@ -882,6 +1104,14 @@ onMounted(() => {
       fetchFavoritesPreview();
       fetchSeenPreview();
     }
+  }
+});
+
+watch(activeRecommendation, (value) => {
+  if (value) {
+    nextTick(() => {
+      modalContainer.value?.focus();
+    });
   }
 });
 
@@ -905,6 +1135,8 @@ watch(authToken, (token) => {
     stats.recentRecommendations = [];
     favoritesPreview.value = [];
     seenPreview.value = [];
+    topRecommendations.value = [];
+    activeRecommendation.value = null;
   }
 });
 

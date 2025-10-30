@@ -3,7 +3,7 @@ version: '3.8'
 services:
   web:
     build: .
-    container_name: recomiendame-coach-web
+    container_name: recomiendame-pelis-web
     ports:
       - '8081:80'
     restart: unless-stopped
