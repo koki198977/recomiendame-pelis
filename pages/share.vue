@@ -22,11 +22,11 @@
           class="overflow-hidden rounded-[32px] border border-white/10 bg-white/5 aspect-[2/3]"
         >
           <img
-            :src="posterSrc"
+            :src="displayPoster"
             :alt="title"
             class="h-full w-full object-cover"
             @error="handleImageError"
-            :key="posterSrc"
+            :key="displayPoster"
           />
         </div>
         <div class="space-y-6">
@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, watch } from "vue";
 import brandLogo from "~/assets/logo.png?url";
 
 const route = useRoute();
@@ -138,13 +138,42 @@ const mediaTypeLabel = computed(() => {
   return "Recomendación personalizada";
 });
 
-const posterSrc = computed(() => {
-  // Usar directamente la URL del poster de los query params
-  return rawPoster.value || placeholder;
+const decodedPoster = computed(() => {
+  const source = rawPoster.value;
+  if (!source) return "";
+  try {
+    return decodeURIComponent(source);
+  } catch {
+    return source;
+  }
 });
+
+const displayPoster = ref<string>(placeholder);
+const fallbackTried = ref(false);
+
+const isTmdbUrl = (value: string) =>
+  /^https?:\/\/image\.tmdb\.org\/.+/i.test(value);
+
+const updatePoster = () => {
+  fallbackTried.value = false;
+  const poster = decodedPoster.value;
+  if (!poster) {
+    displayPoster.value = placeholder;
+    return;
+  }
+  displayPoster.value = poster;
+};
+
+watch(decodedPoster, updatePoster, { immediate: true });
 
 const handleImageError = (event: Event) => {
   const img = event.target as HTMLImageElement;
+  const poster = decodedPoster.value;
+  if (!fallbackTried.value && poster && isTmdbUrl(poster)) {
+    fallbackTried.value = true;
+    img.src = `${origin}/api/image-proxy?url=${encodeURIComponent(poster)}`;
+    return;
+  }
   if (img.src !== placeholder) {
     console.warn("Error cargando imagen:", img.src);
     img.src = placeholder;
@@ -153,7 +182,7 @@ const handleImageError = (event: Event) => {
 
 const absolutePoster = computed(() => {
   try {
-    return new URL(posterSrc.value, origin).toString();
+    return new URL(displayPoster.value, origin).toString();
   } catch {
     return placeholder;
   }
