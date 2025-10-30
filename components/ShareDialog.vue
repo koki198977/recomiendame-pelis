@@ -282,8 +282,10 @@ const resolvePosterSource = (src?: string | null) => {
           parsed.toString()
         )}`;
       }
-      // En producción, usar directamente TMDB (con CORS)
-      return parsed.toString();
+      // En producción, usar proxy público como fallback
+      return `https://api.allorigins.win/raw?url=${encodeURIComponent(
+        parsed.toString()
+      )}`;
     }
     return parsed.toString();
   } catch {
@@ -582,13 +584,8 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
         "Fallo al cargar poster remoto, usando placeholder:",
         posterError
       );
-      try {
-        poster = await loadImage(placeholderImage);
-        console.log("Placeholder cargado exitosamente");
-      } catch (placeholderError) {
-        console.error("Error cargando placeholder:", placeholderError);
-        throw new Error("No se pudo cargar ninguna imagen");
-      }
+      poster = await loadImage(placeholderImage);
+      console.log("Usando placeholder por error en carga");
     }
     const posterAreaWidth = width - margin * 2;
     const posterAreaHeight = height * 0.58;
@@ -840,22 +837,6 @@ const loadImage = (src: string) =>
     // Si es una imagen data: o placeholder, no intentar fetch
     if (src.startsWith("data:")) {
       throw originalError;
-    }
-
-    // Si es una URL de proxy que falló, intentar directamente con TMDB
-    if (src.includes("/api/image-proxy")) {
-      try {
-        const urlParam = new URL(src).searchParams.get("url");
-        if (urlParam && urlParam.includes("image.tmdb.org")) {
-          console.log(
-            "Proxy falló, intentando directamente con TMDB:",
-            urlParam
-          );
-          return await createImage(urlParam);
-        }
-      } catch (proxyError) {
-        console.warn("Error procesando URL de proxy:", proxyError);
-      }
     }
 
     try {
