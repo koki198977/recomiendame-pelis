@@ -272,13 +272,18 @@ const resolvePosterSource = (src?: string | null) => {
         : "https://recomiendameapp.cl"
     );
     if (TMDB_HOSTS.includes(parsed.hostname)) {
-      const origin =
-        typeof window !== "undefined"
-          ? window.location.origin
-          : "https://recomiendameapp.cl";
-      return `${origin}/api/image-proxy?url=${encodeURIComponent(
-        parsed.toString()
-      )}`;
+      // En desarrollo, usar el proxy local
+      if (
+        typeof window !== "undefined" &&
+        window.location.hostname === "localhost"
+      ) {
+        const origin = window.location.origin;
+        return `${origin}/api/image-proxy?url=${encodeURIComponent(
+          parsed.toString()
+        )}`;
+      }
+      // En producción, usar directamente TMDB (con CORS)
+      return parsed.toString();
     }
     return parsed.toString();
   } catch {
@@ -835,6 +840,22 @@ const loadImage = (src: string) =>
     // Si es una imagen data: o placeholder, no intentar fetch
     if (src.startsWith("data:")) {
       throw originalError;
+    }
+
+    // Si es una URL de proxy que falló, intentar directamente con TMDB
+    if (src.includes("/api/image-proxy")) {
+      try {
+        const urlParam = new URL(src).searchParams.get("url");
+        if (urlParam && urlParam.includes("image.tmdb.org")) {
+          console.log(
+            "Proxy falló, intentando directamente con TMDB:",
+            urlParam
+          );
+          return await createImage(urlParam);
+        }
+      } catch (proxyError) {
+        console.warn("Error procesando URL de proxy:", proxyError);
+      }
     }
 
     try {
