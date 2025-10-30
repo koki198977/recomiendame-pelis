@@ -4,7 +4,7 @@
       <img
         :src="posterSrc"
         :alt="`Poster de ${item.title}`"
-        class="h-44 w-full object-cover"
+        class="h-48 w-full object-cover sm:h-52"
       />
       <span
         class="absolute left-4 top-4 inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white/70 backdrop-blur"
@@ -12,9 +12,9 @@
         {{ mediaBadge }}
       </span>
     </div>
-    <div class="p-5 space-y-3">
-      <div class="flex items-start justify-between gap-3">
-        <h3 class="text-lg font-semibold text-white">{{ item.title }}</h3>
+    <div class="space-y-3 p-5 sm:p-6">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        <h3 class="text-base font-semibold text-white sm:text-lg">{{ item.title }}</h3>
         <span v-if="item.addedAt" class="text-xs text-white/40">
           {{ formattedDate }}
         </span>
@@ -33,7 +33,7 @@
       </div>
       <div class="flex justify-end">
         <button
-          class="inline-flex items-center gap-2 rounded-full bg-red-500/20 px-3 py-1 text-xs font-semibold text-red-200 hover:bg-red-500/30 transition disabled:opacity-40"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-500/20 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40 sm:w-auto sm:text-xs sm:py-1.5"
           :disabled="deleting"
           @click="$emit('remove')"
         >

@@ -8,24 +8,24 @@
       <div
         class="absolute inset-0 -z-10 bg-gradient-to-tr from-primary-500/20 via-transparent to-secondary-500/30 blur-3xl"
       ></div>
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-        <div class="grid lg:grid-cols-12 gap-16 items-center">
-          <div class="lg:col-span-6 space-y-8">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+        <div class="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
+          <div class="space-y-6 lg:col-span-6 lg:space-y-8">
             <span
               class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white/70"
             >
               <span class="text-lg leading-none">🔮</span> IA que entiende tus
               gustos
             </span>
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-semibold leading-tight">
+            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-semibold leading-tight">
               Recomiéndame analiza lo que viste y te sugiere qué ver después
             </h1>
-            <p class="text-lg sm:text-xl text-white/70 max-w-xl">
+            <p class="text-base text-white/70 sm:text-lg lg:text-xl max-w-xl">
               Marca lo que ya disfrutaste, guarda tus favoritos y construye una
               watchlist dinámica. Nuestra IA aprende de tus géneros, ritmos y
               moods para entregar recomendaciones explicadas en segundos.
             </p>
-            <div class="flex flex-col sm:flex-row gap-4">
+            <div class="stack-mobile sm:flex-row">
               <NuxtLink to="/login" class="btn-primary inline-flex items-center gap-2">
                 <span>Inicia sesión</span>
                 <span aria-hidden="true">→</span>
@@ -58,7 +58,7 @@
           </div>
           <div class="lg:col-span-6">
             <div
-              class="relative mx-auto max-w-xl rounded-[2.5rem] bg-surface-900/80 p-6 sm:p-8 shadow-strong border border-white/10"
+              class="relative mx-auto max-w-xl rounded-[2rem] border border-white/10 bg-surface-900/80 p-5 shadow-strong sm:rounded-[2.5rem] sm:p-8"
             >
               <div
                 class="absolute -top-12 -left-10 h-32 w-32 rounded-full bg-secondary-500/40 blur-2xl"
@@ -235,7 +235,7 @@
                 />
               </div>
             </figure>
-            <div class="grid grid-cols-2 gap-6 justify-items-center">
+            <div class="grid grid-cols-1 gap-6 justify-items-center sm:grid-cols-2">
               <figure
                 class="phone phone--compact"
                 aria-label="Detalle explicativo de una recomendación"

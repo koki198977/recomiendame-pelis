@@ -10,8 +10,8 @@
 
       <div class="space-y-6">
         <div class="card space-y-4">
-          <div class="flex items-center justify-between">
-            <div>
+          <div class="stack-mobile sm:flex-row sm:items-center sm:justify-between">
+            <div class="space-y-1">
               <h2 class="text-xl font-semibold">Información básica</h2>
               <p class="text-sm text-white/60">Solo tú puedes ver estos datos. Todos los campos son opcionales.</p>
             </div>

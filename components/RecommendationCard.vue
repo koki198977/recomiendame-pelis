@@ -4,7 +4,7 @@
       <img
         :src="imageSrc"
         :alt="`Poster de ${item.title}`"
-        class="h-44 w-full object-cover"
+        class="h-48 w-full object-cover sm:h-56"
       />
       <span
         v-if="mediaBadge"
@@ -13,12 +13,12 @@
         {{ mediaBadge }}
       </span>
     </div>
-    <div class="p-5 space-y-4">
-      <div class="flex items-start justify-between gap-3">
-        <h3 class="text-lg font-semibold text-white">{{ item.title }}</h3>
+    <div class="space-y-4 p-5 sm:p-6">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        <h3 class="text-base font-semibold text-white sm:text-lg">{{ item.title }}</h3>
         <span
           v-if="item.voteAverage"
-          class="inline-flex items-center gap-1 rounded-full bg-secondary-500/20 px-3 py-1 text-xs font-semibold text-secondary-100"
+          class="inline-flex items-center gap-1 self-start rounded-full bg-secondary-500/20 px-3 py-1 text-xs font-semibold text-secondary-100"
         >
           ⭐ {{ item.voteAverage.toFixed(1) }}
         </span>
@@ -65,46 +65,46 @@
 
       <div
         v-if="showActions"
-        class="flex flex-wrap gap-3 pt-2 border-t border-white/10 mt-1 pt-3"
+        class="flex flex-col gap-2 border-t border-white/10 pt-3 sm:flex-row sm:flex-wrap sm:gap-3"
       >
         <button
           v-if="!states?.seen"
-          class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 hover:bg-accent-500/20 transition"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-accent-500/20 sm:w-auto sm:text-xs sm:py-1.5"
           @click="emit('mark-seen', item)"
         >
           👀 Marcar visto
         </button>
         <span
           v-else
-          class="inline-flex items-center gap-2 rounded-full bg-accent-500/20 px-3 py-1 text-xs font-semibold text-accent-100"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent-500/20 px-3 py-2 text-sm font-semibold text-accent-100 sm:w-auto sm:text-xs sm:py-1.5"
         >
           ✅ Ya visto
         </span>
 
         <button
           v-if="!states?.favorite"
-          class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 hover:bg-secondary-500/20 transition"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-secondary-500/20 sm:w-auto sm:text-xs sm:py-1.5"
           @click="emit('mark-favorite', item)"
         >
           ❤️ Favorito
         </button>
         <span
           v-else
-          class="inline-flex items-center gap-2 rounded-full bg-secondary-500/20 px-3 py-1 text-xs font-semibold text-secondary-100"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-secondary-500/20 px-3 py-2 text-sm font-semibold text-secondary-100 sm:w-auto sm:text-xs sm:py-1.5"
         >
           ❤️ En favoritos
         </span>
 
         <button
           v-if="!states?.wishlist"
-          class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 hover:bg-primary-500/20 transition"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-primary-500/20 sm:w-auto sm:text-xs sm:py-1.5"
           @click="emit('mark-wishlist', item)"
         >
           ⭐ Añadir a wishlist
         </button>
         <span
           v-else
-          class="inline-flex items-center gap-2 rounded-full bg-primary-500/20 px-3 py-1 text-xs font-semibold text-primary-100"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-500/20 px-3 py-2 text-sm font-semibold text-primary-100 sm:w-auto sm:text-xs sm:py-1.5"
         >
           ⭐ En wishlist
         </span>

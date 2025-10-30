@@ -5,7 +5,7 @@
       class="sticky top-0 z-50 backdrop-blur border-b border-white/10 bg-surface-950/80"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-20">
+        <div class="flex items-center justify-between h-16 sm:h-20">
           <!-- Logo -->
           <NuxtLink :to="isAuthenticated ? '/dashboard' : '/'" class="flex items-center gap-3">
             <img :src="logoUrl" alt="Recomiéndame" class="h-10 w-10" />
@@ -20,7 +20,7 @@
           </NuxtLink>
 
           <!-- Navigation Links -->
-          <div class="hidden md:flex items-center gap-8">
+          <div class="hidden md:flex items-center gap-6 xl:gap-8">
             <template v-if="isAuthenticated">
               <NuxtLink
                 v-for="item in authenticatedNav"
@@ -62,7 +62,7 @@
 
           <!-- Mobile menu button -->
           <button
-            class="md:hidden text-white/80 hover:text-white transition"
+            class="md:hidden rounded-full bg-white/5 p-2 text-white/80 transition hover:bg-white/10 hover:text-white"
             @click="mobileMenuOpen = !mobileMenuOpen"
             aria-label="Menu"
           >

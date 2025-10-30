@@ -34,18 +34,18 @@
             v-for="suggestion in promptSuggestions"
             :key="suggestion"
             type="button"
-            class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 hover:bg-primary-500/20 hover:text-white transition"
+            class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 transition hover:bg-primary-500/20 hover:text-white"
             @click="appendPrompt(suggestion)"
           >
             {{ suggestion }}
           </button>
         </div>
 
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div class="flex items-center gap-3">
+        <div class="stack-mobile sm:flex-row sm:items-center sm:justify-between">
+          <div class="stack-mobile sm:flex-row sm:items-center">
             <button
               type="submit"
-              class="btn-primary inline-flex items-center gap-2"
+              class="btn-primary inline-flex items-center justify-center gap-2"
               :disabled="isLoading"
             >
               <span v-if="!isLoading">Generar recomendaciones</span>
@@ -75,7 +75,7 @@
             </button>
             <button
               type="button"
-              class="btn-secondary inline-flex items-center gap-2"
+              class="btn-secondary inline-flex items-center justify-center gap-2"
               @click="refreshRecommendations"
             >
               Actualizar

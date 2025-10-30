@@ -14,7 +14,7 @@
             <p class="text-sm uppercase tracking-[0.4em] text-white/50">
               Hola {{ userDisplayName }}
             </p>
-            <h1 class="text-4xl sm:text-5xl font-semibold leading-tight">
+            <h1 class="text-3xl sm:text-5xl font-semibold leading-tight">
               Vamos a encontrar algo que te vuelva a emocionar
             </h1>
             <p class="text-white/70 text-lg leading-relaxed">
@@ -32,7 +32,7 @@
               class="card p-6"
             >
               <p class="text-xs uppercase tracking-[0.3em] text-white/40">{{ card.label }}</p>
-              <p class="mt-4 text-4xl font-semibold" :class="card.accent">
+              <p class="mt-4 text-3xl font-semibold sm:text-4xl" :class="card.accent">
                 <span v-if="statsLoading" class="animate-pulse text-white/40">···</span>
                 <span v-else>{{ card.value }}</span>
               </p>
@@ -208,8 +208,12 @@
         <article
           v-for="item in topRecommendations"
           :key="item.id || `${item.tmdbId}-${item.mediaType}` || item.title"
-          class="card flex h-full cursor-pointer flex-col gap-4 p-0 overflow-hidden transition hover:-translate-y-1 hover:shadow-medium"
+          class="card flex h-full cursor-pointer flex-col gap-4 overflow-hidden p-0 transition hover:-translate-y-1 hover:shadow-medium focus:outline-none focus-visible:-translate-y-1 focus-visible:ring-2 focus-visible:ring-primary-400"
+          role="button"
+          tabindex="0"
           @click="openRecommendationDetails(item)"
+          @keydown.enter.prevent="openRecommendationDetails(item)"
+          @keydown.space.prevent="openRecommendationDetails(item)"
         >
           <div class="relative w-full">
             <div class="relative mx-4 mt-4 overflow-hidden rounded-3xl border border-white/5">
@@ -296,7 +300,7 @@
           @click.self="closeRecommendationDetails"
         >
           <div
-            class="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong"
+            class="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] overflow-y-auto"
           >
             <button
               type="button"

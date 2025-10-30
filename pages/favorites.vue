@@ -15,7 +15,7 @@
             <label class="text-xs uppercase tracking-[0.3em] text-white/40" for="favorites-search">
               Buscar favoritos
             </label>
-            <div class="relative">
+            <div class="stack-mobile sm:flex-row sm:items-center">
               <input
                 id="favorites-search"
                 v-model="filters.search"
@@ -25,7 +25,7 @@
                 @input="handleSearchChange"
               />
               <button
-                class="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-primary-500/80 px-4 py-2 text-xs font-semibold hover:bg-primary-400 transition"
+                class="btn-primary inline-flex items-center justify-center gap-2 sm:w-auto"
                 @click="triggerSearch"
                 :disabled="isLoading"
               >
@@ -108,7 +108,7 @@
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4"
         @click.self="closeAddModal"
       >
-        <div class="w-full max-w-3xl rounded-3xl bg-surface-900 p-8 shadow-strong border border-white/10">
+        <div class="w-full max-w-3xl rounded-3xl border border-white/10 bg-surface-900 p-6 shadow-strong sm:p-8 max-h-[90vh] overflow-y-auto">
           <div class="flex items-start justify-between gap-4">
             <div>
               <h2 class="text-2xl font-semibold">Agregar a favoritos</h2>
@@ -129,7 +129,7 @@
               <label class="text-xs uppercase tracking-[0.3em] text-white/40" for="favorites-add-input">
                 Buscar en el catálogo
               </label>
-              <div class="flex gap-3">
+              <div class="stack-mobile sm:flex-row">
                 <input
                   id="favorites-add-input"
                   v-model="addSearchQuery"
@@ -139,7 +139,7 @@
                   @keyup.enter="performAddSearch"
                 />
                 <button
-                  class="btn-primary"
+                  class="btn-primary inline-flex items-center justify-center"
                   :disabled="addSearchLoading"
                   @click="performAddSearch"
                 >

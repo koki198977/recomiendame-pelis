@@ -16,19 +16,50 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-400 hover:to-secondary-400 text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-soft hover:shadow-medium;
+    @apply bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-400 hover:to-secondary-400 text-white font-semibold py-3 px-6 rounded-full transition-all duration-200 shadow-soft hover:shadow-medium text-sm;
   }
-  
+
   .btn-secondary {
-    @apply bg-transparent hover:bg-white/5 text-white font-semibold py-3 px-6 rounded-full border border-white/20 transition-all duration-200 shadow-soft hover:shadow-medium;
+    @apply bg-transparent hover:bg-white/5 text-white font-semibold py-3 px-6 rounded-full border border-white/20 transition-all duration-200 shadow-soft hover:shadow-medium text-sm;
+  }
+
+  @screen md {
+    .btn-primary,
+    .btn-secondary {
+      @apply text-base;
+    }
   }
   
   .card {
-    @apply bg-surface-900 rounded-3xl shadow-soft p-6 border border-white/5;
+    @apply bg-surface-900 rounded-[28px] shadow-soft p-5 border border-white/5;
+  }
+
+  .card-hover {
+    @apply bg-surface-900 rounded-[28px] shadow-soft hover:shadow-medium transition-all duration-200 p-5 border border-white/5;
   }
   
-  .card-hover {
-    @apply bg-surface-900 rounded-3xl shadow-soft hover:shadow-medium transition-all duration-200 p-6 border border-white/5;
+  @screen md {
+    .btn-primary,
+    .btn-secondary {
+      @apply py-3.5 px-7;
+    }
+
+    .card,
+    .card-hover {
+      @apply p-6 rounded-3xl;
+    }
+  }
+}
+
+@layer utilities {
+  .stack-mobile {
+    @apply flex flex-col gap-3;
+  }
+
+  @screen sm {
+    .stack-mobile {
+      @apply flex-row gap-4;
+    }
   }
 }
 

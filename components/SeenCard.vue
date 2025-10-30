@@ -1,6 +1,6 @@
 <template>
   <div class="card-hover h-full overflow-hidden">
-    <div class="relative h-48 w-full overflow-hidden rounded-3xl">
+    <div class="relative h-52 w-full overflow-hidden rounded-3xl sm:h-48">
       <img
         :src="posterSrc"
         :alt="`Poster de ${item.title}`"
@@ -13,15 +13,15 @@
       </span>
     </div>
     <div class="space-y-3 pt-4">
-      <div class="flex items-start justify-between gap-3">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p class="text-xs uppercase tracking-[0.3em] text-white/40">
             {{ formattedDate }}
           </p>
-          <h3 class="text-lg font-semibold">{{ item.title }}</h3>
+          <h3 class="text-base font-semibold sm:text-lg">{{ item.title }}</h3>
         </div>
         <button
-          class="inline-flex items-center rounded-full bg-red-500/20 px-3 py-1 text-xs font-semibold text-red-200 hover:bg-red-500/30 transition disabled:opacity-40"
+          class="inline-flex w-full items-center justify-center rounded-full bg-red-500/20 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40 sm:w-auto sm:text-xs sm:py-1.5"
           :disabled="deleting"
           @click="$emit('remove')"
         >
