@@ -1,36 +1,58 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950 text-white">
+  <div
+    class="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-950 text-white"
+  >
     <div class="mx-auto flex w-full max-w-5xl flex-col gap-10 px-6 py-16">
       <header class="space-y-4 text-center">
         <img :src="brandLogo" alt="Recomiéndame" class="mx-auto h-12 w-auto" />
         <div class="space-y-2">
-          <p class="text-xs uppercase tracking-[0.3em] text-white/40">Compartido desde Recomiéndame</p>
+          <p class="text-xs uppercase tracking-[0.3em] text-white/40">
+            Compartido desde Recomiéndame
+          </p>
           <h1 class="text-3xl font-semibold sm:text-4xl">{{ title }}</h1>
           <p class="text-sm text-white/60">
-            La IA de Recomiéndame descubrió esta recomendación especialmente para ti.
+            La IA de Recomiéndame descubrió esta recomendación especialmente
+            para ti.
           </p>
         </div>
       </header>
 
       <section class="grid gap-8 lg:grid-cols-[320px_1fr]">
-        <div class="overflow-hidden rounded-[32px] border border-white/10 bg-white/5 aspect-[2/3]">
-          <img :src="posterSrc" :alt="title" class="h-full w-full object-cover" />
+        <div
+          class="overflow-hidden rounded-[32px] border border-white/10 bg-white/5 aspect-[2/3]"
+        >
+          <img
+            :src="posterSrc"
+            :alt="title"
+            class="h-full w-full object-cover"
+            @error="handleImageError"
+            :key="posterSrc"
+          />
         </div>
         <div class="space-y-6">
           <div class="space-y-3">
-            <p class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/40">
+            <p
+              class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/40"
+            >
               {{ mediaTypeLabel }}
             </p>
             <p class="text-sm text-white/70">
-              Genera tu propio perfil y recibe recomendaciones personalizadas en segundos.
+              Genera tu propio perfil y recibe recomendaciones personalizadas en
+              segundos.
             </p>
           </div>
 
-          <div class="rounded-3xl border border-white/10 bg-white/5 p-6 space-y-4">
-            <h2 class="text-lg font-semibold">¿Quieres recomendaciones como esta?</h2>
+          <div
+            class="rounded-3xl border border-white/10 bg-white/5 p-6 space-y-4"
+          >
+            <h2 class="text-lg font-semibold">
+              ¿Quieres recomendaciones como esta?
+            </h2>
             <ul class="space-y-2 text-sm text-white/70">
               <li>• Marca lo que ya viste y construye nuevas listas.</li>
-              <li>• Guarda favoritos y wishlist sincronizados con la app móvil.</li>
+              <li>
+                • Guarda favoritos y wishlist sincronizados con la app móvil.
+              </li>
               <li>• La IA aprende de tus gustos para sugerirte lo mejor.</li>
             </ul>
             <NuxtLink
@@ -49,14 +71,18 @@
         </div>
       </section>
 
-      <footer class="border-t border-white/10 pt-6 text-center text-xs text-white/50">
-        Recomiéndame · Analiza tus gustos y te sugiere películas y series a tu medida.
+      <footer
+        class="border-t border-white/10 pt-6 text-center text-xs text-white/50"
+      >
+        Recomiéndame · Analiza tus gustos y te sugiere películas y series a tu
+        medida.
       </footer>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from "vue";
 import brandLogo from "~/assets/logo.png?url";
 
 const route = useRoute();
@@ -73,7 +99,11 @@ const computeOrigin = () => {
   const host = forwardedHost || headers.host || "localhost:3000";
   const protocol =
     forwardedProto ||
-    (headers["x-forwarded-ssl"] === "on" ? "https" : event.node.req.connection.encrypted ? "https" : "http");
+    (headers["x-forwarded-ssl"] === "on"
+      ? "https"
+      : event.node.req.connection.encrypted
+      ? "https"
+      : "http");
   return `${protocol}://${host}`;
 };
 
@@ -82,10 +112,18 @@ const origin = computeOrigin();
 const placeholder =
   "https://placehold.co/600x900/1A0F59/FFFFFF?text=Recomiendame";
 
-const rawTitle = computed(() => (typeof route.query.title === "string" ? route.query.title : ""));
-const rawType = computed(() => (typeof route.query.type === "string" ? route.query.type : ""));
-const rawPoster = computed(() => (typeof route.query.poster === "string" ? route.query.poster : ""));
-const rawTmdbId = computed(() => (typeof route.query.tmdbId === "string" ? route.query.tmdbId : ""));
+const rawTitle = computed(() =>
+  typeof route.query.title === "string" ? route.query.title : ""
+);
+const rawType = computed(() =>
+  typeof route.query.type === "string" ? route.query.type : ""
+);
+const rawPoster = computed(() =>
+  typeof route.query.poster === "string" ? route.query.poster : ""
+);
+const rawTmdbId = computed(() =>
+  typeof route.query.tmdbId === "string" ? route.query.tmdbId : ""
+);
 
 const title = computed(() => rawTitle.value || "Recomendación de Recomiéndame");
 const tmdbLink = computed(() => {
@@ -101,31 +139,17 @@ const mediaTypeLabel = computed(() => {
 });
 
 const posterSrc = computed(() => {
-  const poster = rawPoster.value;
-  if (!poster) return placeholder;
-  
-  // Si ya es una URL completa, usarla directamente
-  if (poster.startsWith('http')) {
-    try {
-      const parsed = new URL(poster);
-      if (parsed.hostname === "image.tmdb.org") {
-        // Usar directamente la URL de TMDB sin proxy para evitar problemas CORS
-        return parsed.toString();
-      }
-      return parsed.toString();
-    } catch {
-      return placeholder;
-    }
-  }
-  
-  // Si no es URL completa, intentar construirla
-  try {
-    const parsed = new URL(poster, origin);
-    return parsed.toString();
-  } catch {
-    return placeholder;
-  }
+  // Usar directamente la URL del poster de los query params
+  return rawPoster.value || placeholder;
 });
+
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement;
+  if (img.src !== placeholder) {
+    console.warn("Error cargando imagen:", img.src);
+    img.src = placeholder;
+  }
+};
 
 const absolutePoster = computed(() => {
   try {
