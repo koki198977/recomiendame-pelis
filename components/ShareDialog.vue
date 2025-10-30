@@ -9,7 +9,7 @@
         tabindex="-1"
       >
         <div
-          class="relative flex w-full max-w-[min(100vw-1.5rem,420px)] flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] sm:max-w-2xl"
+          class="relative flex w-full max-w-[min(100vw-1.5rem,420px)] flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] sm:max-w-2xl lg:max-w-4xl"
         >
           <button
             class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
@@ -20,11 +20,13 @@
             ✕
           </button>
           <div class="flex-1 overflow-y-auto">
-            <div class="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:gap-8">
-              <div class="space-y-4">
+            <div
+              class="flex flex-col gap-6 p-5 sm:p-6 lg:grid lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:gap-8"
+            >
+              <div class="space-y-4 order-2 lg:order-1">
                 <div class="relative">
                   <div
-                    class="share-preview aspect-[3/4] w-full overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-surface-800/80 via-surface-900 to-surface-950 shadow-xl sm:aspect-[4/5]"
+                    class="share-preview aspect-[3/4] w-full max-w-[280px] mx-auto overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-surface-800/80 via-surface-900 to-surface-950 shadow-xl sm:aspect-[4/5] lg:max-w-none lg:mx-0"
                   >
                     <Transition name="fade">
                       <img
@@ -35,18 +37,35 @@
                         class="h-full w-full object-cover"
                       />
                       <div
-                        v-else
+                        v-else-if="isGeneratingPreview"
                         class="flex h-full w-full flex-col items-center justify-center gap-3 text-center text-white/50"
                       >
                         <span
                           class="inline-flex h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-white/70"
                           aria-hidden="true"
                         />
-                        <p class="text-sm font-semibold uppercase tracking-[0.3em]">
+                        <p
+                          class="text-sm font-semibold uppercase tracking-[0.3em]"
+                        >
                           Generando arte
                         </p>
                         <p class="max-w-[220px] text-xs text-white/40">
-                          Preparando una tarjeta para compartir con tus contactos…
+                          Preparando una tarjeta para compartir con tus
+                          contactos…
+                        </p>
+                      </div>
+                      <div
+                        v-else
+                        class="flex h-full w-full flex-col items-center justify-center gap-3 text-center text-white/50"
+                      >
+                        <div class="text-4xl">🎬</div>
+                        <p
+                          class="text-sm font-semibold uppercase tracking-[0.3em]"
+                        >
+                          {{ item?.title || "Contenido" }}
+                        </p>
+                        <p class="max-w-[220px] text-xs text-white/40">
+                          Imagen no disponible
                         </p>
                       </div>
                     </Transition>
@@ -70,31 +89,42 @@
                     </button>
                   </div>
                   <p class="text-xs text-white/40">
-                    Usa la tarjeta para historias o publicaciones. El formato es 1080×1350px con
-                    branding de Recomiéndame.
+                    Usa la tarjeta para historias o publicaciones. El formato es
+                    1080×1350px con branding de Recomiéndame.
                   </p>
                 </div>
                 <p v-if="shareError" class="text-xs font-semibold text-red-300">
                   {{ shareError }}
                 </p>
               </div>
-              <div class="space-y-5">
+              <div class="space-y-5 order-1 lg:order-2">
                 <div class="space-y-2">
-                  <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/50">
-                    {{ item.mediaType === "tv" ? "Serie" : "Película" }} · Recomiéndame
+                  <span
+                    class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/50"
+                  >
+                    {{ item.mediaType === "tv" ? "Serie" : "Película" }} ·
+                    Recomiéndame
                   </span>
                   <h3 class="text-2xl font-semibold text-white">
                     {{ item.title }}
                   </h3>
-                  <p v-if="item.reason" class="text-xs uppercase tracking-[0.3em] text-white/40">
+                  <p
+                    v-if="item.reason"
+                    class="text-xs uppercase tracking-[0.3em] text-white/40"
+                  >
                     {{ item.reason }}
                   </p>
-                  <p v-if="item.overview" class="text-sm text-white/70 leading-relaxed line-clamp-4">
+                  <p
+                    v-if="item.overview"
+                    class="text-sm text-white/70 leading-relaxed line-clamp-4"
+                  >
                     {{ item.overview }}
                   </p>
                 </div>
 
-                <div class="flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
+                <div
+                  class="flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-3"
+                >
                   <button
                     v-if="canUseShare"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-400 sm:col-span-2"
@@ -106,21 +136,33 @@
                     class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
                     @click="shareInstagram"
                   >
-                    <img src="/social/share-instagram.svg" alt="Instagram" class="h-4 w-4" />
+                    <img
+                      src="/social/share-instagram.svg"
+                      alt="Instagram"
+                      class="h-4 w-4"
+                    />
                     Instagram
                   </button>
                   <button
                     class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
                     @click="shareWhatsapp"
                   >
-                    <img src="/social/whatsapp.svg" alt="WhatsApp" class="h-4 w-4" />
+                    <img
+                      src="/social/whatsapp.svg"
+                      alt="WhatsApp"
+                      class="h-4 w-4"
+                    />
                     WhatsApp
                   </button>
                   <button
                     class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
                     @click="shareFacebook"
                   >
-                    <img src="/social/facebook.svg" alt="Facebook" class="h-4 w-4" />
+                    <img
+                      src="/social/facebook.svg"
+                      alt="Facebook"
+                      class="h-4 w-4"
+                    />
                     Facebook
                   </button>
                   <button
@@ -141,19 +183,30 @@
                   {{ feedbackMessage }}
                 </p>
 
-                <div class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs text-white/60">
-                  <p class="font-semibold uppercase tracking-[0.3em] text-white/40">Mensaje sugerido</p>
+                <div
+                  class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs text-white/60"
+                >
+                  <p
+                    class="font-semibold uppercase tracking-[0.3em] text-white/40"
+                  >
+                    Mensaje sugerido
+                  </p>
                   <p class="mt-2 whitespace-pre-line break-words text-white/70">
                     {{ shareMessage }}
                   </p>
                   <p class="mt-2 text-[11px] text-white/40">
-                    Generado por Recomiéndame · <span class="break-all text-primary-200">{{ shareLandingUrlDisplay }}</span>
+                    Generado por Recomiéndame ·
+                    <span class="break-all text-primary-200">{{
+                      shareLandingUrlDisplay
+                    }}</span>
                   </p>
                 </div>
               </div>
             </div>
           </div>
-          <div class="border-t border-white/10 bg-surface-900/80 px-6 pb-6 pt-4 sm:px-8">
+          <div
+            class="border-t border-white/10 bg-surface-900/80 px-6 pb-6 pt-4 sm:px-8"
+          >
             <button
               type="button"
               class="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
@@ -179,6 +232,9 @@ const props = defineProps<{
     reason?: string;
     mediaType?: string;
     tmdbId?: number;
+    voteAverage?: number;
+    releaseDate?: string;
+    platforms?: string[];
   } | null;
   show: boolean;
   shareUrl?: string;
@@ -198,7 +254,9 @@ const shareError = ref("");
 const generatedObjectUrls: string[] = [];
 
 const siteOrigin = computed(() =>
-  typeof window !== "undefined" ? window.location.origin : "https://recomiendameapp.cl"
+  typeof window !== "undefined"
+    ? window.location.origin
+    : "https://recomiendameapp.cl"
 );
 
 const TMDB_HOSTS = ["image.tmdb.org"];
@@ -209,12 +267,18 @@ const resolvePosterSource = (src?: string | null) => {
   try {
     const parsed = new URL(
       src,
-      typeof window !== "undefined" ? window.location.origin : "https://recomiendameapp.cl"
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "https://recomiendameapp.cl"
     );
     if (TMDB_HOSTS.includes(parsed.hostname)) {
       const origin =
-        typeof window !== "undefined" ? window.location.origin : "https://recomiendameapp.cl";
-      return `${origin}/api/image-proxy?url=${encodeURIComponent(parsed.toString())}`;
+        typeof window !== "undefined"
+          ? window.location.origin
+          : "https://recomiendameapp.cl";
+      return `${origin}/api/image-proxy?url=${encodeURIComponent(
+        parsed.toString()
+      )}`;
     }
     return parsed.toString();
   } catch {
@@ -224,7 +288,9 @@ const resolvePosterSource = (src?: string | null) => {
 
 const tmdbUrl = computed(() => {
   if (props.item?.tmdbId && props.item?.mediaType) {
-    return `https://www.themoviedb.org/${props.item.mediaType === "tv" ? "tv" : "movie"}/${props.item.tmdbId}`;
+    return `https://www.themoviedb.org/${
+      props.item.mediaType === "tv" ? "tv" : "movie"
+    }/${props.item.tmdbId}`;
   }
   return "";
 });
@@ -244,7 +310,9 @@ const shareLandingUrl = computed(() => {
 
 const shareMessage = computed(() => {
   const strongPitch = `Recomiéndame me sugirió "${props.item?.title}"`;
-  const tmdbReference = tmdbUrl.value ? `\nMira los detalles en TMDB: ${tmdbUrl.value}` : "";
+  const tmdbReference = tmdbUrl.value
+    ? `\nMira los detalles en TMDB: ${tmdbUrl.value}`
+    : "";
   return `${strongPitch}.\nDescubre tus próximas películas y series en ${siteOrigin.value}.\nExplora esta recomendación: ${shareLandingUrl.value}${tmdbReference}`;
 });
 
@@ -257,7 +325,9 @@ const shareLandingUrlDisplay = computed(() => {
   }
 });
 
-const canUseShare = computed(() => typeof navigator !== "undefined" && !!navigator.share);
+const canUseShare = computed(
+  () => typeof navigator !== "undefined" && !!navigator.share
+);
 
 watch(
   () => [props.show, props.item?.tmdbId],
@@ -295,17 +365,23 @@ const shareFacebook = async () => {
 
   try {
     await navigator.clipboard.writeText(shareMessage.value);
-    feedbackMessage.value = "Copiamos el mensaje. Pégalo en la ventana de Facebook.";
+    feedbackMessage.value =
+      "Copiamos el mensaje. Pégalo en la ventana de Facebook.";
   } catch {
-    feedbackMessage.value = "Abrimos Facebook; recuerda mencionar Recomiéndame en tu mensaje.";
+    feedbackMessage.value =
+      "Abrimos Facebook; recuerda mencionar Recomiéndame en tu mensaje.";
   }
 
-  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}&quote=${encodeURIComponent(shareMessage.value)}`;
+  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+    shareLink
+  )}&quote=${encodeURIComponent(shareMessage.value)}`;
   openWindow(url);
 };
 
 const shareTwitter = () => {
-  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage.value)}&url=${encodeURIComponent(shareLandingUrl.value)}`;
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+    shareMessage.value
+  )}&url=${encodeURIComponent(shareLandingUrl.value)}`;
   openWindow(url);
 };
 
@@ -326,9 +402,13 @@ const nativeShare = async () => {
     const imageUrl = await ensureShareImage();
     if (imageUrl && navigator.canShare && typeof File !== "undefined") {
       const blob = await (await fetch(imageUrl)).blob();
-      const file = new File([blob], `${slugify(props.item?.title ?? "recomendacion")}.png`, {
-        type: blob.type,
-      });
+      const file = new File(
+        [blob],
+        `${slugify(props.item?.title ?? "recomendacion")}.png`,
+        {
+          type: blob.type,
+        }
+      );
       if (navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
@@ -387,7 +467,8 @@ const downloadShareImage = async () => {
 
 const copyImage = async () => {
   if (!process.client || typeof ClipboardItem === "undefined") {
-    feedbackMessage.value = "Tu navegador no permite copiar imágenes automáticamente.";
+    feedbackMessage.value =
+      "Tu navegador no permite copiar imágenes automáticamente.";
     return;
   }
   try {
@@ -401,7 +482,8 @@ const copyImage = async () => {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(shareMessage.value);
     }
-    feedbackMessage.value = "Imagen copiada. También pegamos el mensaje recomendado.";
+    feedbackMessage.value =
+      "Imagen copiada. También pegamos el mensaje recomendado.";
   } catch {
     feedbackMessage.value = "No pudimos copiar la imagen automáticamente.";
   }
@@ -418,12 +500,18 @@ const shareInstagram = async () => {
   if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
     try {
       const blob = await (await fetch(imageUrl)).blob();
-      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+      await navigator.clipboard.write([
+        new ClipboardItem({ [blob.type]: blob }),
+      ]);
       if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(shareMessage.value);
       }
       if (process.client) {
-        window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer");
+        window.open(
+          "https://www.instagram.com/",
+          "_blank",
+          "noopener,noreferrer"
+        );
       }
       feedbackMessage.value =
         "Imagen y texto copiados. Abre Instagram y pégalos en tus historias o publicaciones.";
@@ -445,6 +533,9 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
   if (!process.client) return;
   isGeneratingPreview.value = true;
   shareError.value = "";
+
+  console.log("Generando imagen para:", item);
+
   try {
     const width = 1080;
     const height = 1350;
@@ -476,11 +567,23 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
 
     let poster: HTMLImageElement;
     const source = resolvePosterSource(item.posterUrl);
+    console.log("Cargando poster desde:", source);
+
     try {
       poster = await loadImage(source);
+      console.log("Poster cargado exitosamente");
     } catch (posterError) {
-      console.warn("Fallo al cargar poster remoto, usando placeholder:", posterError);
-      poster = await loadImage(placeholderImage);
+      console.warn(
+        "Fallo al cargar poster remoto, usando placeholder:",
+        posterError
+      );
+      try {
+        poster = await loadImage(placeholderImage);
+        console.log("Placeholder cargado exitosamente");
+      } catch (placeholderError) {
+        console.error("Error cargando placeholder:", placeholderError);
+        throw new Error("No se pudo cargar ninguna imagen");
+      }
     }
     const posterAreaWidth = width - margin * 2;
     const posterAreaHeight = height * 0.58;
@@ -507,7 +610,12 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
 
     // Cinta degradada
     const ribbonY = posterY + posterHeight - 120;
-    const ribbonGradient = context.createLinearGradient(0, ribbonY, width, ribbonY + 240);
+    const ribbonGradient = context.createLinearGradient(
+      0,
+      ribbonY,
+      width,
+      ribbonY + 240
+    );
     ribbonGradient.addColorStop(0, "rgba(168, 85, 247, 0.0)");
     ribbonGradient.addColorStop(0.5, "rgba(168, 85, 247, 0.3)");
     ribbonGradient.addColorStop(1, "rgba(236, 72, 153, 0.2)");
@@ -526,7 +634,13 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
 
     const logo = await loadImage(brandLogo);
     const logoSize = 72;
-    context.drawImage(logo, width - margin - logoSize, margin - 6, logoSize, logoSize);
+    context.drawImage(
+      logo,
+      width - margin - logoSize,
+      margin - 6,
+      logoSize,
+      logoSize
+    );
 
     const textAreaX = margin;
     let textCursorY = posterY + posterHeight + 80;
@@ -539,13 +653,29 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
 
     context.fillStyle = "#FFFFFF";
     context.font = "bold 78px 'Helvetica', 'Arial', sans-serif";
-    textCursorY = drawWrappedText(context, item.title, textAreaX, textCursorY, textAreaWidth, 86, 3);
+    textCursorY = drawWrappedText(
+      context,
+      item.title,
+      textAreaX,
+      textCursorY,
+      textAreaWidth,
+      86,
+      3
+    );
     textCursorY += 30;
 
     if (item.reason) {
       context.fillStyle = "rgba(255, 255, 255, 0.6)";
       context.font = "600 32px 'Helvetica', 'Arial', sans-serif";
-      textCursorY = drawWrappedText(context, item.reason, textAreaX, textCursorY, textAreaWidth, 48, 1);
+      textCursorY = drawWrappedText(
+        context,
+        item.reason,
+        textAreaX,
+        textCursorY,
+        textAreaWidth,
+        48,
+        1
+      );
       textCursorY += 20;
     }
 
@@ -557,7 +687,11 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
     if (item.releaseDate) {
       context.fillStyle = "rgba(255, 255, 255, 0.6)";
       context.font = "600 32px 'Helvetica', 'Arial', sans-serif";
-      context.fillText(`Estreno ${formatDate(item.releaseDate)}`, textAreaX, textCursorY);
+      context.fillText(
+        `Estreno ${formatDate(item.releaseDate)}`,
+        textAreaX,
+        textCursorY
+      );
       textCursorY += 56;
     }
 
@@ -565,14 +699,26 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
       context.fillStyle = "rgba(255, 255, 255, 0.75)";
       context.font = "500 30px 'Helvetica', 'Arial', sans-serif";
       const platforms = formatPlatforms(item.platforms);
-      textCursorY = drawWrappedText(context, platforms, textAreaX, textCursorY, textAreaWidth, 44, 2);
+      textCursorY = drawWrappedText(
+        context,
+        platforms,
+        textAreaX,
+        textCursorY,
+        textAreaWidth,
+        44,
+        2
+      );
       textCursorY += 28;
     }
 
     const baseLine = height - margin;
     context.fillStyle = "rgba(255, 255, 255, 0.5)";
     context.font = "500 28px 'Helvetica', 'Arial', sans-serif";
-    context.fillText("Generado por Recomiéndame · recomiendameapp.cl", textAreaX, baseLine);
+    context.fillText(
+      "Generado por Recomiéndame · recomiendameapp.cl",
+      textAreaX,
+      baseLine
+    );
 
     sharePreviewUrl.value = canvas.toDataURL("image/png", 0.92);
   } catch (error) {
@@ -637,7 +783,10 @@ const drawWrappedText = (
   if (lines.length > maxLines) {
     linesToRender = lines.slice(0, maxLines);
     const lastIndex = linesToRender.length - 1;
-    linesToRender[lastIndex] = `${linesToRender[lastIndex].replace(/\s+$/, "")}…`;
+    linesToRender[lastIndex] = `${linesToRender[lastIndex].replace(
+      /\s+$/,
+      ""
+    )}…`;
   }
 
   linesToRender.forEach((line) => {
@@ -682,7 +831,14 @@ const drawRatingBadge = (
 const loadImage = (src: string) =>
   createImage(src).catch(async (originalError) => {
     if (!process.client) throw originalError;
+
+    // Si es una imagen data: o placeholder, no intentar fetch
+    if (src.startsWith("data:")) {
+      throw originalError;
+    }
+
     try {
+      console.log("Intentando fetch para:", src);
       const response = await fetch(src, {
         mode: "cors",
         referrerPolicy: "no-referrer",
@@ -706,7 +862,8 @@ const createImage = (src: string) =>
     img.crossOrigin = "anonymous";
     img.referrerPolicy = "no-referrer";
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`No se pudo cargar la imagen: ${src}`));
+    img.onerror = () =>
+      reject(new Error(`No se pudo cargar la imagen: ${src}`));
     img.src = src;
   });
 
