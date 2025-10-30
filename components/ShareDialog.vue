@@ -261,6 +261,15 @@ const siteOrigin = computed(() =>
 
 const TMDB_HOSTS = ["image.tmdb.org"];
 
+const getProxyUrls = (originalUrl: string) => {
+  const encoded = encodeURIComponent(originalUrl);
+  return [
+    `https://api.allorigins.win/raw?url=${encoded}`,
+    `https://cors-anywhere.herokuapp.com/${originalUrl}`,
+    `https://api.codetabs.com/v1/proxy?quest=${encoded}`,
+  ];
+};
+
 const resolvePosterSource = (src?: string | null) => {
   if (!src) return placeholderImage;
   if (src.startsWith("data:")) return src;
@@ -282,10 +291,8 @@ const resolvePosterSource = (src?: string | null) => {
           parsed.toString()
         )}`;
       }
-      // En producción, usar proxy público como fallback
-      return `https://api.allorigins.win/raw?url=${encodeURIComponent(
-        parsed.toString()
-      )}`;
+      // En producción, devolver la primera opción de proxy
+      return getProxyUrls(parsed.toString())[0];
     }
     return parsed.toString();
   } catch {
@@ -576,16 +583,42 @@ const generateShareImage = async (item: NonNullable<typeof props.item>) => {
     const source = resolvePosterSource(item.posterUrl);
     console.log("Cargando poster desde:", source);
 
+    // Intentar cargar el poster con múltiples proxies si es necesario
+    let posterLoaded = false;
+
     try {
       poster = await loadImage(source);
       console.log("Poster cargado exitosamente");
+      posterLoaded = true;
     } catch (posterError) {
-      console.warn(
-        "Fallo al cargar poster remoto, usando placeholder:",
-        posterError
-      );
-      poster = await loadImage(placeholderImage);
-      console.log("Usando placeholder por error en carga");
+      console.warn("Fallo al cargar poster con proxy principal:", posterError);
+
+      // Si es una URL de TMDB y no estamos en localhost, intentar otros proxies
+      if (
+        item.posterUrl &&
+        item.posterUrl.includes("image.tmdb.org") &&
+        typeof window !== "undefined" &&
+        window.location.hostname !== "localhost"
+      ) {
+        const proxyUrls = getProxyUrls(item.posterUrl);
+
+        for (let i = 1; i < proxyUrls.length && !posterLoaded; i++) {
+          try {
+            console.log(`Intentando proxy alternativo ${i}:`, proxyUrls[i]);
+            poster = await loadImage(proxyUrls[i]);
+            console.log(`Poster cargado con proxy alternativo ${i}`);
+            posterLoaded = true;
+          } catch (proxyError) {
+            console.warn(`Proxy alternativo ${i} falló:`, proxyError);
+          }
+        }
+      }
+
+      if (!posterLoaded) {
+        console.warn("Todos los proxies fallaron, usando placeholder");
+        poster = await loadImage(placeholderImage);
+        console.log("Usando placeholder por error en carga");
+      }
     }
     const posterAreaWidth = width - margin * 2;
     const posterAreaHeight = height * 0.58;
@@ -830,8 +863,13 @@ const drawRatingBadge = (
   context.fillText(`${voteAverage.toFixed(1)}/10`, x + 74, y + 12);
 };
 
-const loadImage = (src: string) =>
-  createImage(src).catch(async (originalError) => {
+const loadImage = async (
+  src: string,
+  retries = 2
+): Promise<HTMLImageElement> => {
+  try {
+    return await createImage(src);
+  } catch (originalError) {
     if (!process.client) throw originalError;
 
     // Si es una imagen data: o placeholder, no intentar fetch
@@ -839,24 +877,40 @@ const loadImage = (src: string) =>
       throw originalError;
     }
 
-    try {
-      console.log("Intentando fetch para:", src);
-      const response = await fetch(src, {
-        mode: "cors",
-        referrerPolicy: "no-referrer",
-      });
-      if (!response.ok) {
-        throw new Error(`Respuesta inválida (${response.status})`);
+    // Intentar con fetch y retry
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        console.log(`Intento ${attempt + 1} de ${retries + 1} para:`, src);
+
+        const response = await fetch(src, {
+          mode: "cors",
+          referrerPolicy: "no-referrer",
+        });
+
+        if (!response.ok) {
+          throw new Error(`Respuesta inválida (${response.status})`);
+        }
+
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        generatedObjectUrls.push(objectUrl);
+        return await createImage(objectUrl);
+      } catch (error) {
+        console.warn(`Intento ${attempt + 1} falló:`, error);
+
+        // Si no es el último intento, esperar un poco antes del retry
+        if (attempt < retries) {
+          await new Promise((resolve) =>
+            setTimeout(resolve, 1000 * (attempt + 1))
+          );
+        }
       }
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      generatedObjectUrls.push(objectUrl);
-      return await createImage(objectUrl);
-    } catch (error) {
-      console.error("No se pudo cargar la imagen remota:", error);
-      throw originalError;
     }
-  });
+
+    console.error("Todos los intentos fallaron para:", src);
+    throw originalError;
+  }
+};
 
 const createImage = (src: string) =>
   new Promise<HTMLImageElement>((resolve, reject) => {
