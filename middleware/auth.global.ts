@@ -3,16 +3,22 @@ export default defineNuxtRouteMiddleware((to, from) => {
     return;
   }
 
-  const isProtected = [
+  const protectedPrefixes = [
     "/dashboard",
     "/recommendations",
     "/seen",
     "/favorites",
     "/wishlist",
     "/profile",
-  ].some((path) => to.path.startsWith(path));
+  ];
+
+  const isProtected = protectedPrefixes.some((path) => to.path.startsWith(path));
 
   const token = localStorage.getItem("recomiendame_token");
+
+  if (to.path === "/" && token) {
+    return navigateTo("/dashboard");
+  }
 
   if (isProtected && !token) {
     return navigateTo("/login");
