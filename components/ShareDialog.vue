@@ -8,7 +8,7 @@
         @keydown.esc="handleClose"
         tabindex="-1"
       >
-        <div class="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong">
+        <div class="relative flex w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[92vh]">
           <button
             class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
             type="button"
@@ -17,137 +17,148 @@
           >
             ✕
           </button>
-          <div class="grid gap-6 p-6 sm:p-8 md:grid-cols-[minmax(240px,320px)_1fr] md:gap-8">
-            <div class="space-y-4">
-              <div class="relative">
-                <div
-                  class="share-preview aspect-[4/5] w-full overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-surface-800/80 via-surface-900 to-surface-950 shadow-xl"
-                >
-                  <Transition name="fade">
-                    <img
-                      v-if="sharePreviewUrl"
-                      :key="sharePreviewUrl"
-                      :src="sharePreviewUrl"
-                      :alt="`Arte social de ${item.title}`"
-                      class="h-full w-full object-cover"
-                    />
-                    <div
-                      v-else
-                      class="flex h-full w-full flex-col items-center justify-center gap-3 text-center text-white/50"
-                    >
-                      <span
-                        class="inline-flex h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-white/70"
-                        aria-hidden="true"
+          <div class="flex-1 overflow-y-auto">
+            <div class="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)]">
+              <div class="space-y-4">
+                <div class="relative">
+                  <div
+                    class="share-preview aspect-[4/5] w-full overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-surface-800/80 via-surface-900 to-surface-950 shadow-xl"
+                  >
+                    <Transition name="fade">
+                      <img
+                        v-if="sharePreviewUrl"
+                        :key="sharePreviewUrl"
+                        :src="sharePreviewUrl"
+                        :alt="`Arte social de ${item.title}`"
+                        class="h-full w-full object-cover"
                       />
-                      <p class="text-sm font-semibold uppercase tracking-[0.3em]">
-                        Generando arte
-                      </p>
-                      <p class="max-w-[220px] text-xs text-white/40">
-                        Preparando una tarjeta para compartir con tus contactos…
-                      </p>
-                    </div>
-                  </Transition>
+                      <div
+                        v-else
+                        class="flex h-full w-full flex-col items-center justify-center gap-3 text-center text-white/50"
+                      >
+                        <span
+                          class="inline-flex h-10 w-10 animate-spin rounded-full border-2 border-white/20 border-t-white/70"
+                          aria-hidden="true"
+                        />
+                        <p class="text-sm font-semibold uppercase tracking-[0.3em]">
+                          Generando arte
+                        </p>
+                        <p class="max-w-[220px] text-xs text-white/40">
+                          Preparando una tarjeta para compartir con tus contactos…
+                        </p>
+                      </div>
+                    </Transition>
+                  </div>
+                  <div class="mt-3 flex items-center gap-3">
+                    <button
+                      class="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-400 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/30"
+                      :disabled="!sharePreviewUrl || isGeneratingPreview"
+                      @click.stop="downloadShareImage"
+                    >
+                      ⬇️ Guardar imagen
+                    </button>
+                    <button
+                      v-if="sharePreviewUrl"
+                      class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                      type="button"
+                      title="Copiar imagen al portapapeles"
+                      @click.stop="copyImage"
+                    >
+                      🖼️
+                    </button>
+                  </div>
+                  <p class="text-xs text-white/40">
+                    Usa la tarjeta para historias o publicaciones. El formato es 1080×1350px con
+                    branding de Recomiéndame.
+                  </p>
                 </div>
-                <div class="mt-3 flex items-center gap-3">
+                <p v-if="shareError" class="text-xs font-semibold text-red-300">
+                  {{ shareError }}
+                </p>
+              </div>
+              <div class="space-y-5">
+                <div class="space-y-2">
+                  <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/50">
+                    {{ item.mediaType === "tv" ? "Serie" : "Película" }} · Recomiéndame
+                  </span>
+                  <h3 class="text-2xl font-semibold text-white">
+                    {{ item.title }}
+                  </h3>
+                  <p v-if="item.reason" class="text-xs uppercase tracking-[0.3em] text-white/40">
+                    {{ item.reason }}
+                  </p>
+                  <p v-if="item.overview" class="text-sm text-white/70 leading-relaxed line-clamp-4">
+                    {{ item.overview }}
+                  </p>
+                </div>
+
+                <div class="flex flex-col gap-2 sm:grid sm:grid-cols-2 sm:gap-3">
                   <button
-                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-400 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/30"
-                    :disabled="!sharePreviewUrl || isGeneratingPreview"
-                    @click.stop="downloadShareImage"
+                    v-if="canUseShare"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-400 sm:col-span-2"
+                    @click="nativeShare"
                   >
-                    ⬇️ Guardar imagen
+                    📲 Compartir desde este dispositivo
                   </button>
                   <button
-                    v-if="sharePreviewUrl"
-                    class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
-                    type="button"
-                    title="Copiar imagen al portapapeles"
-                    @click.stop="copyImage"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="shareInstagram"
                   >
-                    🖼️
+                    <img src="/social/share-instagram.svg" alt="Instagram" class="h-4 w-4" />
+                    Instagram
+                  </button>
+                  <button
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="shareWhatsapp"
+                  >
+                    <img src="/social/whatsapp.svg" alt="WhatsApp" class="h-4 w-4" />
+                    WhatsApp
+                  </button>
+                  <button
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="shareFacebook"
+                  >
+                    <img src="/social/facebook.svg" alt="Facebook" class="h-4 w-4" />
+                    Facebook
+                  </button>
+                  <button
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="shareTwitter"
+                  >
+                    🐦 X / Twitter
+                  </button>
+                  <button
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 sm:col-span-2"
+                    @click="copyLink"
+                  >
+                    📋 Copiar enlace
                   </button>
                 </div>
-                <p class="text-xs text-white/40">
-                  Usa la tarjeta para historias o publicaciones. El formato es 1080×1350px con
-                  branding de Recomiéndame.
-                </p>
-              </div>
-              <p v-if="shareError" class="text-xs font-semibold text-red-300">
-                {{ shareError }}
-              </p>
-            </div>
-            <div class="space-y-5">
-              <div class="space-y-2">
-                <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/50">
-                  {{ item.mediaType === "tv" ? "Serie" : "Película" }} · Recomiéndame
-                </span>
-                <h3 class="text-2xl font-semibold text-white">
-                  {{ item.title }}
-                </h3>
-                <p v-if="item.reason" class="text-xs uppercase tracking-[0.3em] text-white/40">
-                  {{ item.reason }}
-                </p>
-                <p v-if="item.overview" class="text-sm text-white/70 leading-relaxed line-clamp-4">
-                  {{ item.overview }}
-                </p>
-              </div>
 
-              <div class="grid gap-3 sm:grid-cols-2">
-                <button
-                  v-if="canUseShare"
-                  class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-primary-400"
-                  @click="nativeShare"
-                >
-                  📲 Compartir desde este dispositivo
-                </button>
-                <button
-                  class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
-                  @click="shareInstagram"
-                >
-                  <img src="/social/instagram.svg" alt="" class="h-4 w-4" />
-                  Instagram
-                </button>
-                <button
-                  class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
-                  @click="shareWhatsapp"
-                >
-                  <img src="/social/whatsapp.svg" alt="" class="h-4 w-4" />
-                  WhatsApp
-                </button>
-                <button
-                  class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
-                  @click="shareFacebook"
-                >
-                  <img src="/social/facebook.svg" alt="" class="h-4 w-4" />
-                  Facebook
-                </button>
-                <button
-                  class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10"
-                  @click="shareTwitter"
-                >
-                  🐦 X / Twitter
-                </button>
-                <button
-                  class="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 sm:col-span-2"
-                  @click="copyLink"
-                >
-                  📋 Copiar enlace
-                </button>
-              </div>
-
-              <p v-if="feedbackMessage" class="text-xs text-primary-200">
-                {{ feedbackMessage }}
-              </p>
-
-              <div class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs text-white/60">
-                <p class="font-semibold uppercase tracking-[0.3em] text-white/40">Mensaje sugerido</p>
-                <p class="mt-2 whitespace-pre-line text-white/70">
-                  {{ shareMessage }}
+                <p v-if="feedbackMessage" class="text-xs text-primary-200">
+                  {{ feedbackMessage }}
                 </p>
-                <p class="mt-2 text-[11px] text-white/40">
-                  Generado por Recomiéndame · <span class="text-primary-200">{{ shareUrl }}</span>
-                </p>
+
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs text-white/60">
+                  <p class="font-semibold uppercase tracking-[0.3em] text-white/40">Mensaje sugerido</p>
+                  <p class="mt-2 whitespace-pre-line break-words text-white/70">
+                    {{ shareMessage }}
+                  </p>
+                  <p class="mt-2 text-[11px] text-white/40">
+                  Generado por Recomiéndame · <span class="break-all text-primary-200">{{ shareLandingUrlDisplay }}</span>
+                  </p>
+                </div>
               </div>
             </div>
+          </div>
+          <div class="border-t border-white/10 bg-surface-900/80 px-6 pb-6 pt-4 sm:px-8">
+            <button
+              type="button"
+              class="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+              @click="handleClose"
+            >
+              Cerrar
+            </button>
           </div>
         </div>
       </div>
@@ -216,10 +227,30 @@ const tmdbUrl = computed(() => {
 
 const shareUrl = computed(() => props.shareUrl || siteOrigin.value);
 
+const shareLandingUrl = computed(() => {
+  if (!props.item) return shareUrl.value;
+  const params = new URLSearchParams({
+    title: props.item.title || "",
+    type: props.item.mediaType || "",
+    tmdbId: props.item.tmdbId?.toString() || "",
+    poster: props.item.posterUrl || "",
+  });
+  return `${siteOrigin.value}/share?${params.toString()}`;
+});
+
 const shareMessage = computed(() => {
   const strongPitch = `Recomiéndame me sugirió "${props.item?.title}"`;
   const tmdbReference = tmdbUrl.value ? `\nMira los detalles en TMDB: ${tmdbUrl.value}` : "";
-  return `${strongPitch}.\nDescubre tus próximas películas y series en ${siteOrigin.value}.${tmdbReference}`;
+  return `${strongPitch}.\nDescubre tus próximas películas y series en ${siteOrigin.value}.\nExplora esta recomendación: ${shareLandingUrl.value}${tmdbReference}`;
+});
+
+const shareLandingUrlDisplay = computed(() => {
+  try {
+    const parsed = new URL(shareLandingUrl.value);
+    return `${parsed.host}${parsed.pathname}`;
+  } catch {
+    return shareLandingUrl.value;
+  }
 });
 
 const canUseShare = computed(() => typeof navigator !== "undefined" && !!navigator.share);
@@ -255,13 +286,22 @@ const shareWhatsapp = () => {
   openWindow(url);
 };
 
-const shareFacebook = () => {
-  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl.value)}&quote=${encodeURIComponent(shareMessage.value)}`;
+const shareFacebook = async () => {
+  const shareLink = shareLandingUrl.value;
+
+  try {
+    await navigator.clipboard.writeText(shareMessage.value);
+    feedbackMessage.value = "Copiamos el mensaje. Pégalo en la ventana de Facebook.";
+  } catch {
+    feedbackMessage.value = "Abrimos Facebook; recuerda mencionar Recomiéndame en tu mensaje.";
+  }
+
+  const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink)}&quote=${encodeURIComponent(shareMessage.value)}`;
   openWindow(url);
 };
 
 const shareTwitter = () => {
-  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage.value)}&url=${encodeURIComponent(shareUrl.value)}`;
+  const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage.value)}&url=${encodeURIComponent(shareLandingUrl.value)}`;
   openWindow(url);
 };
 
@@ -269,7 +309,7 @@ const copyLink = async () => {
   if (!process.client) return;
   try {
     await navigator.clipboard.writeText(shareMessage.value);
-    feedbackMessage.value = "Enlace copiado al portapapeles.";
+    feedbackMessage.value = "Mensaje y enlace copiados al portapapeles.";
   } catch {
     feedbackMessage.value = "No pudimos copiar el enlace automáticamente.";
   }
@@ -299,7 +339,7 @@ const nativeShare = async () => {
       await navigator.share({
         title: `Recomiéndame: ${props.item?.title}`,
         text: shareMessage.value,
-        url: shareUrl.value,
+        url: shareLandingUrl.value,
       });
     }
     handleClose();

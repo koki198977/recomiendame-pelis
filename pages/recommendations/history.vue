@@ -143,12 +143,12 @@
         <div
           v-if="activeRecommendation"
           ref="modalContainer"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/90 px-4 py-10 backdrop-blur-md"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/90 px-4 py-6 sm:px-6 sm:py-10 backdrop-blur-md"
           tabindex="-1"
           @keydown.esc="closeDetails"
           @click.self="closeDetails"
         >
-          <div class="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] overflow-y-auto">
+          <div class="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[92vh]">
             <button
               type="button"
               class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
@@ -157,7 +157,7 @@
             >
               ✕
             </button>
-            <div class="grid gap-6 p-8 md:grid-cols-[220px_1fr]">
+            <div class="grid flex-1 gap-6 overflow-y-auto p-6 sm:p-8 md:grid-cols-[220px_1fr] md:overflow-visible">
               <div class="overflow-hidden rounded-3xl border border-white/10">
                 <img
                   :src="activeRecommendation?.posterUrl || placeholderImage"
@@ -241,6 +241,15 @@
                   </button>
                 </div>
               </div>
+            </div>
+            <div class="border-t border-white/10 bg-surface-900/80 px-6 pb-6 pt-4 sm:px-8">
+              <button
+                type="button"
+                class="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                @click="closeDetails"
+              >
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
