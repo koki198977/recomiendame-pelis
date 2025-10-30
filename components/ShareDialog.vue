@@ -3,12 +3,14 @@
     <transition name="fade">
       <div
         v-if="show && item"
-        class="fixed inset-0 z-[999] flex items-center justify-center bg-surface-950/90 px-4 py-10 backdrop-blur-md"
+        class="fixed inset-0 z-[999] flex items-center justify-center bg-surface-950/90 px-4 py-6 backdrop-blur-md sm:px-6 sm:py-10"
         @click.self="handleClose"
         @keydown.esc="handleClose"
         tabindex="-1"
       >
-        <div class="relative flex w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[92vh]">
+        <div
+          class="relative flex w-full max-w-[min(100vw-1.5rem,420px)] flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] sm:max-w-2xl"
+        >
           <button
             class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
             type="button"
@@ -18,11 +20,11 @@
             ✕
           </button>
           <div class="flex-1 overflow-y-auto">
-            <div class="grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)]">
+            <div class="grid gap-6 p-5 sm:p-6 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)] lg:gap-8">
               <div class="space-y-4">
                 <div class="relative">
                   <div
-                    class="share-preview aspect-[4/5] w-full overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-surface-800/80 via-surface-900 to-surface-950 shadow-xl"
+                    class="share-preview aspect-[3/4] w-full overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-br from-surface-800/80 via-surface-900 to-surface-950 shadow-xl sm:aspect-[4/5]"
                   >
                     <Transition name="fade">
                       <img
@@ -145,7 +147,7 @@
                     {{ shareMessage }}
                   </p>
                   <p class="mt-2 text-[11px] text-white/40">
-                  Generado por Recomiéndame · <span class="break-all text-primary-200">{{ shareLandingUrlDisplay }}</span>
+                    Generado por Recomiéndame · <span class="break-all text-primary-200">{{ shareLandingUrlDisplay }}</span>
                   </p>
                 </div>
               </div>
@@ -210,7 +212,9 @@ const resolvePosterSource = (src?: string | null) => {
       typeof window !== "undefined" ? window.location.origin : "https://recomiendameapp.cl"
     );
     if (TMDB_HOSTS.includes(parsed.hostname)) {
-      return `/api/image-proxy?url=${encodeURIComponent(parsed.toString())}`;
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : "https://recomiendameapp.cl";
+      return `${origin}/api/image-proxy?url=${encodeURIComponent(parsed.toString())}`;
     }
     return parsed.toString();
   } catch {
