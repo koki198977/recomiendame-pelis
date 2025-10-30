@@ -99,16 +99,27 @@
           </p>
         </div>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <RecommendationCard
+          <article
             v-for="item in recommendations"
             :key="item.id || item.title"
-            :item="item"
-            :states="itemStates(item)"
-            :show-actions="true"
-            @mark-favorite="markFavorite"
-            @mark-seen="markSeen"
-            @mark-wishlist="markWishlist"
-          />
+            class="card-hover flex h-full cursor-pointer flex-col overflow-hidden p-0 transition hover:-translate-y-1 hover:shadow-medium focus:outline-none focus-visible:-translate-y-1 focus-visible:ring-2 focus-visible:ring-primary-400"
+            role="button"
+            tabindex="0"
+            @click="openDetails(item)"
+            @keydown.enter.prevent="openDetails(item)"
+            @keydown.space.prevent="openDetails(item)"
+          >
+            <RecommendationCard
+              :item="item"
+              :states="itemStates(item)"
+              :show-actions="true"
+              :show-overview="false"
+              show-details-hint
+              @mark-favorite="(entry) => markFavorite(entry)"
+              @mark-seen="(entry) => markSeen(entry)"
+              @mark-wishlist="(entry) => markWishlist(entry)"
+            />
+          </article>
         </div>
       </section>
 
@@ -117,10 +128,114 @@
         sugerencias generales.
       </div>
     </section>
+    <Teleport to="body">
+      <transition name="fade">
+        <div
+          v-if="activeRecommendation"
+          ref="modalContainer"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-surface-950/90 px-4 py-10 backdrop-blur-md"
+          tabindex="-1"
+          @keydown.esc="closeDetails"
+          @click.self="closeDetails"
+        >
+          <div
+            class="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[90vh] overflow-y-auto"
+          >
+            <button
+              type="button"
+              class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
+              @click="closeDetails"
+              aria-label="Cerrar detalles"
+            >
+              ✕
+            </button>
+            <div class="grid gap-6 p-8 md:grid-cols-[220px_1fr]">
+              <div class="overflow-hidden rounded-3xl border border-white/10">
+                <img
+                  :src="activeRecommendation?.posterUrl || placeholderImage"
+                  :alt="activeRecommendation?.title"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.3em] text-white/40">
+                    {{ activeRecommendation?.mediaType === "tv" ? "Serie" : "Película" }}
+                  </p>
+                  <h3 class="mt-2 text-2xl font-semibold">
+                    {{ activeRecommendation?.title }}
+                  </h3>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-white/70">
+                  <span class="inline-flex items-center gap-2 text-primary-100">
+                    ⭐
+                    <span class="text-lg font-semibold text-white">
+                      {{ formatVoteAverage(activeRecommendation?.voteAverage) }}
+                    </span>
+                  </span>
+                  <span>{{ formatReleaseLabel(activeRecommendation?.releaseDate) }}</span>
+                  <span v-if="activeRecommendation?.reason" class="text-xs uppercase tracking-[0.3em] text-white/40">
+                    {{ activeRecommendation.reason }}
+                  </span>
+                </div>
+                <p v-if="activeRecommendation?.overview" class="text-sm leading-relaxed text-white/80">
+                  {{ activeRecommendation.overview }}
+                </p>
+                <div v-if="activeRecommendation?.platforms?.length" class="flex flex-wrap gap-2">
+                  <span
+                    v-for="platform in activeRecommendation.platforms"
+                    :key="platform"
+                    class="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70"
+                  >
+                    {{ platform }}
+                  </span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    :class="actionButtonClass(activeStates.seen)"
+                    :disabled="activeStates.seen"
+                    @click="markSeen(activeRecommendation)"
+                  >
+                    {{ activeStates.seen ? "👀 Ya visto" : "👀 Marcar visto" }}
+                  </button>
+                  <button
+                    type="button"
+                    :class="actionButtonClass(activeStates.favorite)"
+                    :disabled="activeStates.favorite"
+                    @click="markFavorite(activeRecommendation)"
+                  >
+                    {{ activeStates.favorite ? "❤️ En favoritos" : "❤️ Favorito" }}
+                  </button>
+                  <button
+                    type="button"
+                    :class="actionButtonClass(activeStates.wishlist)"
+                    :disabled="activeStates.wishlist"
+                    @click="markWishlist(activeRecommendation)"
+                  >
+                    {{ activeStates.wishlist ? "⭐ En wishlist" : "⭐ Añadir a wishlist" }}
+                  </button>
+                  <a
+                    v-if="activeRecommendation?.trailerUrl"
+                    :href="activeRecommendation.trailerUrl"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                  >
+                    ▶️ Ver trailer
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
+import { nextTick } from "vue";
 import RecommendationCard from "~/components/RecommendationCard.vue";
 import {
   useAuthToken,
@@ -150,6 +265,8 @@ const errorMessage = ref("");
 const feedbackMessage = ref("");
 const feedbackType = ref<"success" | "info" | "error">("info");
 const lastUpdated = ref<string | null>(null);
+const activeRecommendation = ref<RecommendationItem | null>(null);
+const modalContainer = ref<HTMLDivElement | null>(null);
 
 const promptSuggestions = [
   "Películas de terror inteligente con finales sorprendentes",
@@ -162,6 +279,8 @@ const authToken = useAuthToken();
 const authUser = useAuthUser();
 const config = useRuntimeConfig();
 const collections = useCollections();
+
+const placeholderImage = "https://placehold.co/200x300/1A0F59/FFFFFF?text=Recomiendame";
 
 const feedbackClass = computed(() => {
   if (feedbackType.value === "error") return "text-red-200";
@@ -241,6 +360,37 @@ const fetchRecommendations = async (promptText?: string) => {
   }
 };
 
+
+const getStates = (item?: RecommendationItem | null) => ({
+  favorite: item ? collections.isFavorite(item.tmdbId, item.mediaType) : false,
+  seen: item ? collections.isSeen(item.tmdbId, item.mediaType) : false,
+  wishlist: item ? collections.isInWishlist(item.tmdbId, item.mediaType) : false,
+});
+
+const actionButtonClass = (active: boolean) =>
+  [
+    "inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition",
+    active
+      ? "border-primary-400 bg-primary-500/20 text-primary-100"
+      : "border-white/10 bg-white/5 text-white/80 hover:bg-white/10",
+  ].join(" ");
+
+const formatVoteAverage = (vote?: number | null) => {
+  if (vote === undefined || vote === null || Number.isNaN(Number(vote))) return "—";
+  return Number(vote).toFixed(1);
+};
+
+const formatReleaseLabel = (date?: string) => {
+  if (!date) return "Estreno pendiente";
+  const dt = new Date(date);
+  if (Number.isNaN(dt.getTime())) return "Estreno pendiente";
+  const formatter = new Intl.DateTimeFormat("es-ES", {
+    month: "short",
+    year: "numeric",
+  });
+  return `Estreno ${formatter.format(dt).replace(".", "").toLowerCase()}`;
+};
+
 const handleSubmit = async () => {
   const value = prompt.value.trim();
   await fetchRecommendations(value || undefined);
@@ -310,6 +460,16 @@ const markWishlist = async (item: RecommendationItem) => {
   }
 };
 
+const openDetails = (item: RecommendationItem) => {
+  activeRecommendation.value = item;
+};
+
+const closeDetails = () => {
+  activeRecommendation.value = null;
+};
+
+const activeStates = computed(() => getStates(activeRecommendation.value));
+
 onMounted(() => {
   if (process.client) {
     syncAuthState();
@@ -328,5 +488,11 @@ watch(authUser, (val) => {
 
 useHead({
   title: "Recomendaciones | Recomiéndame",
+});
+
+watch(activeRecommendation, (value) => {
+  if (value) {
+    nextTick(() => modalContainer.value?.focus());
+  }
 });
 </script>

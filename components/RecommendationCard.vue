@@ -26,7 +26,7 @@
       <p v-if="item.reason" class="text-xs uppercase tracking-[0.3em] text-white/40">
         {{ item.reason }}
       </p>
-      <p v-if="description" class="text-sm leading-relaxed text-white/60">
+      <p v-if="props.showOverview && description" class="text-sm leading-relaxed text-white/60">
         {{ description }}
       </p>
       <p v-if="item.releaseDate" class="text-xs uppercase tracking-[0.3em] text-white/40">
@@ -63,6 +63,13 @@
         </a>
       </div>
 
+      <p
+        v-if="props.showDetailsHint"
+        class="text-xs font-semibold text-primary-200 sm:text-[11px]"
+      >
+        Ver más →
+      </p>
+
       <div
         v-if="showActions"
         class="flex flex-col gap-2 border-t border-white/10 pt-3 sm:flex-row sm:flex-wrap sm:gap-3"
@@ -70,7 +77,7 @@
         <button
           v-if="!states?.seen"
           class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-accent-500/20 sm:w-auto sm:text-xs sm:py-1.5"
-          @click="emit('mark-seen', item)"
+          @click.stop="emit('mark-seen', item)"
         >
           👀 Marcar visto
         </button>
@@ -84,7 +91,7 @@
         <button
           v-if="!states?.favorite"
           class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-secondary-500/20 sm:w-auto sm:text-xs sm:py-1.5"
-          @click="emit('mark-favorite', item)"
+          @click.stop="emit('mark-favorite', item)"
         >
           ❤️ Favorito
         </button>
@@ -98,7 +105,7 @@
         <button
           v-if="!states?.wishlist"
           class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-primary-500/20 sm:w-auto sm:text-xs sm:py-1.5"
-          @click="emit('mark-wishlist', item)"
+          @click.stop="emit('mark-wishlist', item)"
         >
           ⭐ Añadir a wishlist
         </button>
@@ -138,11 +145,19 @@ interface RecommendationStates {
   wishlist?: boolean;
 }
 
-const props = defineProps<{
-  item: RecommendationCardItem;
-  states?: RecommendationStates;
-  showActions?: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    item: RecommendationCardItem;
+    states?: RecommendationStates;
+    showActions?: boolean;
+    showOverview?: boolean;
+    showDetailsHint?: boolean;
+  }>(),
+  {
+    showOverview: true,
+    showDetailsHint: false,
+  }
+);
 
 const emit = defineEmits<{
   (e: "mark-favorite", item: RecommendationCardItem): void;

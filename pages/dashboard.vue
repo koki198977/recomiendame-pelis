@@ -254,6 +254,9 @@
                 {{ platform }}
               </span>
             </div>
+            <p class="text-xs font-semibold text-primary-200">
+              Ver más →
+            </p>
             <div class="mt-auto grid gap-2">
               <button
                 type="button"
