@@ -16,11 +16,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
 
   const token = localStorage.getItem("recomiendame_token");
 
-  if (to.path === "/" && token) {
-    return navigateTo("/dashboard");
-  }
-
+  // Para rutas protegidas sin token, redireccionar al login
   if (isProtected && !token) {
     return navigateTo("/login");
   }
+
+  // No hacer redirección automática desde "/" aquí
+  // Esto se manejará en la página principal después de la hidratación
 });

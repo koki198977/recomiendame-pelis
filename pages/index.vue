@@ -1,5 +1,15 @@
 <template>
   <div class="relative overflow-hidden">
+    <!-- Loading state para usuarios logueados -->
+    <div v-if="isCheckingAuth" class="min-h-screen bg-surface-950 flex items-center justify-center">
+      <div class="text-center space-y-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto"></div>
+        <p class="text-white/70 text-sm">Verificando sesión...</p>
+      </div>
+    </div>
+    
+    <!-- Contenido principal -->
+    <div v-else>
     <!-- Hero Section -->
     <section class="relative isolate">
       <div
@@ -300,6 +310,7 @@
         </div>
       </div>
     </section>
+    </div> <!-- Cierre del contenido principal -->
   </div>
 </template>
 
@@ -307,6 +318,8 @@
 import screenRecs from "~/assets/screens/recs.jpg?url";
 import screenRecsDetail from "~/assets/screens/recs2.jpg?url";
 import screenSeen from "~/assets/screens/seen.jpg?url";
+
+const isCheckingAuth = ref(true);
 
 const sampleRecommendations = [
   {
@@ -388,6 +401,22 @@ const featureHighlights = [
       "Recibe avisos cuando un estreno cae en tu afinidad o está por salir de la plataforma que prefieres.",
   },
 ];
+
+// Redireccionar a dashboard si el usuario está logueado
+onMounted(() => {
+  if (process.client) {
+    // Esperar un poco para que se complete la hidratación
+    setTimeout(() => {
+      const token = localStorage.getItem("recomiendame_token");
+      if (token) {
+        navigateTo("/dashboard");
+      } else {
+        // Si no hay token, mostrar el contenido
+        isCheckingAuth.value = false;
+      }
+    }, 300);
+  }
+});
 
 useHead({
   title: "Recomiéndame | IA que encuentra tu próxima película o serie favorita",
