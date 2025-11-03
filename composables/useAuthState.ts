@@ -1,42 +1,44 @@
 export const useAuthToken = () =>
-  useState<string | null>("recomiendame_token", () => {
-    if (process.client) {
-      return localStorage.getItem("recomiendame_token");
-    }
-    return null;
-  });
+  useState<string | null>("recomiendame_token", () => null);
 
 export const useAuthUser = () =>
-  useState<Record<string, any> | null>("recomiendame_user", () => {
-    if (process.client) {
-      const stored = localStorage.getItem("recomiendame_user");
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch {
-          return null;
-        }
-      }
-    }
-    return null;
-  });
+  useState<Record<string, any> | null>("recomiendame_user", () => null);
 
 export const syncAuthState = () => {
   if (!process.client) return;
+  
   const tokenState = useAuthToken();
   const userState = useAuthUser();
 
-  const token = localStorage.getItem("recomiendame_token");
-  const user = localStorage.getItem("recomiendame_user");
+  try {
+    const token = localStorage.getItem("recomiendame_token");
+    const user = localStorage.getItem("recomiendame_user");
 
-  tokenState.value = token;
-  if (user) {
-    try {
-      userState.value = JSON.parse(user);
-    } catch {
+    tokenState.value = token;
+    
+    if (user) {
+      try {
+        userState.value = JSON.parse(user);
+      } catch (error) {
+        console.warn('Error parsing user data:', error);
+        userState.value = null;
+        localStorage.removeItem("recomiendame_user");
+      }
+    } else {
       userState.value = null;
     }
-  } else {
+  } catch (error) {
+    console.warn('Error syncing auth state:', error);
+    tokenState.value = null;
     userState.value = null;
+  }
+};
+
+export const initAuthState = () => {
+  if (!process.client) return;
+  
+  // Solo sincronizar en el cliente después de que la página esté completamente cargada
+  if (typeof window !== 'undefined') {
+    syncAuthState();
   }
 };

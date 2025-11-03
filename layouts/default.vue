@@ -20,8 +20,16 @@
           </NuxtLink>
 
           <!-- Navigation Links -->
-          <div class="hidden md:flex items-center gap-6 xl:gap-8">
-            <template v-if="isAuthenticated">
+          <div class="hidden md:flex items-center gap-6 xl:gap-8 transition-opacity duration-300" :class="{ 'opacity-50': !isHydrated }">
+            <!-- Mostrar skeleton mientras se hidrata -->
+            <div v-if="!isHydrated" class="flex items-center gap-6">
+              <div class="h-4 w-20 bg-white/10 rounded animate-pulse"></div>
+              <div class="h-4 w-24 bg-white/10 rounded animate-pulse"></div>
+              <div class="h-8 w-16 bg-white/10 rounded-full animate-pulse"></div>
+            </div>
+            
+            <!-- Contenido real después de hidratación -->
+            <template v-else-if="isAuthenticated">
               <NuxtLink
                 v-for="item in authenticatedNav"
                 :key="item.to"
@@ -88,7 +96,15 @@
           class="md:hidden pb-6 border-t border-white/10"
         >
           <div class="flex flex-col gap-4 pt-4 text-sm">
-            <template v-if="isAuthenticated">
+            <!-- Mostrar skeleton mientras se hidrata -->
+            <div v-if="!isHydrated" class="flex flex-col gap-4">
+              <div class="h-4 w-32 bg-white/10 rounded animate-pulse"></div>
+              <div class="h-4 w-28 bg-white/10 rounded animate-pulse"></div>
+              <div class="h-8 w-20 bg-white/10 rounded-full animate-pulse"></div>
+            </div>
+            
+            <!-- Contenido real después de hidratación -->
+            <template v-else-if="isAuthenticated">
               <NuxtLink
                 v-for="item in authenticatedNav"
                 :key="`mobile-${item.to}`"
@@ -241,6 +257,7 @@ import {
   useAuthToken,
   useAuthUser,
   syncAuthState,
+  initAuthState,
 } from '~/composables/useAuthState';
 
 const mobileMenuOpen = ref(false);
@@ -249,7 +266,8 @@ const router = useRouter();
 
 const tokenState = useAuthToken();
 const userState = useAuthUser();
-const isAuthenticated = computed(() => Boolean(tokenState.value));
+const isHydrated = ref(false);
+const isAuthenticated = computed(() => Boolean(tokenState.value) && isHydrated.value);
 
 const authenticatedNav = [
   { to: '/dashboard', label: 'Inicio' },
@@ -283,8 +301,17 @@ const logout = () => {
 
 onMounted(() => {
   if (!process.client) return;
-  syncAuthState();
+  
+  // Inicializar estado de autenticación
+  initAuthState();
+  
+  // Escuchar cambios en localStorage
   window.addEventListener('storage', syncAuthState);
+  
+  // Marcar como hidratado después de un pequeño delay
+  setTimeout(() => {
+    isHydrated.value = true;
+  }, 100);
 });
 
 onBeforeUnmount(() => {
