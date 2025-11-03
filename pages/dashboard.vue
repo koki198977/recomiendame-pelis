@@ -103,110 +103,19 @@
       </div>
     </section>
 
-    <!-- Prompt Generator -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-      <div class="card relative overflow-hidden">
-        <div class="absolute -right-24 top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-primary-500/20 blur-3xl"></div>
-        <div class="absolute -left-20 -bottom-16 h-48 w-48 rounded-full bg-secondary-500/20 blur-3xl"></div>
-        <div class="relative grid gap-8 md:grid-cols-[1.2fr_1fr]">
-          <div class="space-y-6">
-            <div>
-              <span class="text-xs uppercase tracking-[0.4em] text-white/50">
-                Generador de mood
-              </span>
-              <h2 class="mt-2 text-2xl font-semibold">¿Qué se te antoja ver hoy?</h2>
-            </div>
-            <p class="text-white/70 text-sm leading-relaxed">
-              Cuéntale a la IA qué emoción buscas, qué actores amas o incluso cuánto tiempo tienes.
-              Te propondrá una lista curada con explicaciones claras para cada título.
-            </p>
-            <form class="space-y-4" @submit.prevent="handlePrompt">
-              <textarea
-                ref="promptTextarea"
-                v-model="prompt"
-                rows="3"
-                class="w-full rounded-3xl border border-white/10 bg-white/5 px-5 py-4 text-sm text-white placeholder:text-white/40 focus:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-500/40 resize-none"
-                placeholder="Ej: Algo cyberpunk con misterio, finales sorprendentes y duración menor a 2 horas."
-              ></textarea>
-              <div class="flex flex-wrap gap-2">
-                <button
-                  v-for="chip in promptChips"
-                  :key="chip"
-                  type="button"
-                  class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-white/70 hover:bg-primary-500/20 hover:text-white transition"
-                  @click="appendChip(chip)"
-                >
-                  {{ chip }}
-                </button>
-              </div>
-              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <button
-                  type="submit"
-                  class="btn-primary inline-flex items-center justify-center gap-2 sm:w-auto"
-                  :disabled="isPromptLoading"
-                >
-                  <span v-if="!isPromptLoading">Generar con IA</span>
-                  <span v-else class="flex items-center gap-2">
-                    <svg
-                      class="h-4 w-4 animate-spin"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle>
-                      <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    Pensando…
-                  </span>
-                </button>
-                <p v-if="promptFeedback" class="text-xs text-accent-100">
-                  {{ promptFeedback }}
-                </p>
-              </div>
-            </form>
-          </div>
-          <div class="card bg-surface-900/60 border border-white/5 space-y-5 p-6">
-            <p class="text-sm text-white/60 leading-relaxed">
-              <span class="text-white font-semibold">Consejo:</span> combina 2 moods y una referencia
-              para resultados más finos. Ej: “Quiero algo esperanzador como <em>Amélie</em> pero con
-              nostalgia sci-fi tipo <em>Her</em>”.
-            </p>
-            <div class="rounded-2xl border border-white/5 bg-white/5 p-4 text-sm text-white/80 space-y-3">
-              <p class="text-xs uppercase tracking-[0.4em] text-white/40">Último resultado</p>
-              <p v-if="promptHistory.length" class="leading-relaxed">
-                {{ promptHistory[0] }}
-              </p>
-              <p v-else class="text-white/50 italic">Aún no has generado recomendaciones.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Recommendations -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 space-y-10">
       <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 class="text-2xl font-semibold">Recomendaciones destacadas</h2>
+          <h2 class="text-2xl font-semibold">Recomendaciones recientes</h2>
           <p class="text-sm text-white/60">
-            Basadas en tus últimos gustos evaluados y el mood de hoy.
+            Un vistazo a las sugerencias históricas que tu IA ha generado para ti.
           </p>
         </div>
       </header>
-      <div v-if="topRecommendations.length" class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div v-if="recentRecommendations.length" class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <article
-          v-for="item in topRecommendations"
+          v-for="item in recentRecommendations"
           :key="item.id || `${item.tmdbId}-${item.mediaType}` || item.title"
           class="card flex h-full cursor-pointer flex-col gap-4 overflow-hidden p-0 transition hover:-translate-y-1 hover:shadow-medium focus:outline-none focus-visible:-translate-y-1 focus-visible:ring-2 focus-visible:ring-primary-400"
           role="button"
@@ -235,6 +144,12 @@
               <h3 class="mt-1 text-lg font-semibold line-clamp-2" :title="item.title">
                 {{ item.title }}
               </h3>
+              <p
+                v-if="item.reason"
+                class="mt-2 text-xs text-white/60 leading-snug line-clamp-3"
+              >
+                {{ item.reason }}
+              </p>
             </div>
             <div class="flex items-center justify-between text-xs text-white/60">
               <span class="inline-flex items-center gap-1 text-primary-100">
@@ -245,6 +160,9 @@
               </span>
               <span>{{ formatReleaseLabel(item.releaseDate) }}</span>
             </div>
+            <p v-if="item.generatedAtLabel" class="text-xs text-white/50">
+              {{ item.generatedAtLabel }}
+            </p>
             <div v-if="item.platforms?.length" class="flex flex-wrap gap-2">
               <span
                 v-for="platform in item.platforms"
@@ -294,8 +212,7 @@
         </article>
       </div>
       <div v-else class="card border border-dashed border-white/10 bg-white/5 p-10 text-center text-sm text-white/60">
-        Aún no tenemos recomendaciones destacadas. Genera una nueva búsqueda o guarda más favoritos
-        para afinar la IA.
+        Aún no contamos con recomendaciones históricas. Guarda nuevos contenidos o vuelve más tarde.
       </div>
     </section>
 
@@ -349,6 +266,9 @@
                     {{ activeRecommendation.reason }}
                   </span>
                 </div>
+                <p v-if="activeRecommendation?.generatedAtLabel" class="text-xs text-white/50">
+                  {{ activeRecommendation.generatedAtLabel }}
+                </p>
                 <p v-if="activeRecommendation?.overview" class="text-sm leading-relaxed text-white/80">
                   {{ activeRecommendation.overview }}
                 </p>
@@ -571,14 +491,21 @@ interface RecommendationItem {
   reason?: string;
   platforms?: string[];
   trailerUrl?: string;
+  generatedAt?: string;
+  generatedAtLabel?: string;
 }
 
-const promptTextarea = ref<HTMLTextAreaElement | null>(null);
-
-const prompt = ref("");
-const promptFeedback = ref("");
-const promptHistory = ref<string[]>([]);
-const isPromptLoading = ref(false);
+const normalizeMediaType = (value?: string | null) => {
+  if (!value) return "movie";
+  const lowered = value.toString().trim().toLowerCase();
+  if (["tv", "tv_show", "show", "serie", "series"].includes(lowered)) {
+    return "tv";
+  }
+  if (["film", "movie", "pelicula", "película"].includes(lowered)) {
+    return "movie";
+  }
+  return lowered === "tvshow" ? "tv" : "movie";
+};
 
 const user = ref<Record<string, any> | null>(null);
 const userDisplayName = computed(() => user.value?.name ?? "Cinéfilo");
@@ -647,13 +574,6 @@ const statCards = computed(() => {
   return cards;
 });
 
-const promptChips = [
-  "Quiero algo feel-good pero con ciencia ficción",
-  "Series cortas para maratón de fin de semana",
-  "Películas de suspenso psicológico europeas",
-  "Anime cyberpunk con estética retro futurista",
-];
-
 const placeholderImage = "https://placehold.co/200x300/1A0F59/FFFFFF?text=Recomiendame";
 
 const formatVoteAverage = (vote?: number | null) => {
@@ -675,6 +595,18 @@ const formatReleaseLabel = (date?: string) => {
   return `Estreno ${formatted}`;
 };
 
+const formatGeneratedDate = (date?: string) => {
+  if (!date) return null;
+  const dt = new Date(date);
+  if (Number.isNaN(dt.getTime())) return null;
+  const formatter = new Intl.DateTimeFormat("es-ES", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  return formatter.format(dt).replace(".", "");
+};
+
 const actionButtonClass = (isActive: boolean) =>
   [
     "w-full rounded-full border px-4 py-2 text-sm font-semibold transition",
@@ -688,7 +620,14 @@ const authUser = useAuthUser();
 const config = useRuntimeConfig();
 const collections = useCollections();
 
-const topRecommendations = ref<RecommendationItem[]>([]);
+const FAVORITES_PREVIEW_FETCH_LIMIT = 200;
+const FAVORITES_PREVIEW_DISPLAY = 3;
+const SEEN_PREVIEW_FETCH_LIMIT = 200;
+const SEEN_PREVIEW_DISPLAY = 4;
+
+const recentRecommendations = computed(() =>
+  (stats.recentRecommendations ?? []).slice(0, 12)
+);
 const activeRecommendation = ref<RecommendationItem | null>(null);
 const modalContainer = ref<HTMLDivElement | null>(null);
 const shareTarget = ref<RecommendationItem | null>(null);
@@ -725,10 +664,6 @@ const seenPreview = ref<SeenPreviewItem[]>([]);
 const seenPreviewLoading = ref(false);
 const seenPreviewError = ref("");
 
-
-const appendChip = (chip: string) => {
-  prompt.value = prompt.value ? `${prompt.value} ${chip}` : chip;
-};
 
 const fetchDashboardStats = async () => {
   if (!authToken.value) return;
@@ -808,9 +743,6 @@ const fetchDashboardStats = async () => {
         .filter((entry: any) => entry?.tmdbId)
         .map(mapRecommendationEntry);
       stats.recentRecommendations = mapped;
-      if (!topRecommendations.value.length && mapped.length) {
-        topRecommendations.value = mapped.slice(0, 6);
-      }
     }
   } catch (error: any) {
     const message =
@@ -854,19 +786,36 @@ const mapSeenEntry = (entry: any): SeenPreviewItem | null => {
   };
 };
 
-const mapRecommendationEntry = (entry: any): RecommendationItem => ({
-  id: entry.id ?? String(entry.tmdbId ?? Math.random().toString(36).slice(2)),
-  tmdbId: entry.tmdbId ?? 0,
-  title: entry.title ?? "Título desconocido",
-  overview: entry.overview,
-  posterUrl: entry.posterUrl,
-  mediaType: entry.mediaType ?? "movie",
-  voteAverage: entry.voteAverage,
-  releaseDate: entry.releaseDate,
-  reason: entry.reason,
-  platforms: entry.platforms ?? [],
-  trailerUrl: entry.trailerUrl,
-});
+const mapRecommendationEntry = (entry: any): RecommendationItem => {
+  const generatedAt = entry.generatedAt ?? entry.createdAt ?? entry.updatedAt;
+  const formattedGeneratedAt = formatGeneratedDate(generatedAt);
+
+  const rawTmdbId = entry.tmdbId ?? entry.tmdb_id ?? entry.tmdbID;
+  const numericTmdbId =
+    typeof rawTmdbId === "number"
+      ? rawTmdbId
+      : typeof rawTmdbId === "string"
+      ? Number(rawTmdbId)
+      : null;
+
+  return {
+    id: entry.id ?? String(entry.tmdbId ?? Math.random().toString(36).slice(2)),
+    tmdbId: Number.isFinite(numericTmdbId) ? numericTmdbId : rawTmdbId ?? 0,
+    title: entry.title ?? "Título desconocido",
+    overview: entry.overview,
+    posterUrl: entry.posterUrl,
+    mediaType: normalizeMediaType(entry.mediaType),
+    voteAverage: entry.voteAverage,
+    releaseDate: entry.releaseDate,
+    reason: entry.reason,
+    platforms: entry.platforms ?? [],
+    trailerUrl: entry.trailerUrl,
+    generatedAt,
+    generatedAtLabel: formattedGeneratedAt
+      ? `Registrada el ${formattedGeneratedAt}`
+      : undefined,
+  };
+};
 
 const fetchFavoritesPreview = async () => {
   if (!authToken.value) return;
@@ -882,7 +831,7 @@ const fetchFavoritesPreview = async () => {
         Accept: 'application/json',
       },
       query: {
-        take: 3,
+        take: FAVORITES_PREVIEW_FETCH_LIMIT,
         skip: 0,
         orderBy: "createdAt",
         order: "desc",
@@ -895,7 +844,8 @@ const fetchFavoritesPreview = async () => {
 
     favoritesPreview.value = rawItems
       .map(mapFavoriteEntry)
-      .filter((item): item is FavoritePreviewItem => Boolean(item));
+      .filter((item): item is FavoritePreviewItem => Boolean(item))
+      .slice(0, FAVORITES_PREVIEW_DISPLAY);
   } catch (error: any) {
     const message =
       error?.data?.message ||
@@ -923,7 +873,7 @@ const fetchSeenPreview = async () => {
         Accept: 'application/json',
       },
       query: {
-        take: 4,
+        take: SEEN_PREVIEW_FETCH_LIMIT,
         skip: 0,
         orderBy: "createdAt",
         order: "desc",
@@ -936,7 +886,8 @@ const fetchSeenPreview = async () => {
 
     seenPreview.value = rawItems
       .map(mapSeenEntry)
-      .filter((item): item is SeenPreviewItem => Boolean(item));
+      .filter((item): item is SeenPreviewItem => Boolean(item))
+      .slice(0, SEEN_PREVIEW_DISPLAY);
   } catch (error: any) {
     const message =
       error?.data?.message ||
@@ -979,70 +930,6 @@ const breakdownRows = computed(() => {
 
 const favoriteGenres = computed(() => stats.favoriteGenres ?? []);
 
-const fetchRecommendations = async (
-  promptText?: string,
-  showFeedback = true
-) => {
-  if (!authToken.value) {
-    promptFeedback.value =
-      "Tu sesión expiró. Inicia sesión nuevamente para generar recomendaciones.";
-    return;
-  }
-
-  isPromptLoading.value = true;
-  promptFeedback.value = "";
-
-  try {
-    const body = promptText ? { feedback: promptText } : {};
-    const response = await $fetch<{ recommendations: RecommendationItem[] }>(
-      "/recommendations",
-      {
-        baseURL: config.public.apiBase,
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${authToken.value}`,
-        },
-        body,
-      }
-    );
-
-    const items = response?.recommendations ?? [];
-    if (items.length) {
-      topRecommendations.value = items;
-      if (showFeedback) {
-        promptFeedback.value = "Listo, ya actualizamos tus recomendaciones.";
-      }
-    } else if (showFeedback) {
-      promptFeedback.value =
-        "No encontramos coincidencias con ese prompt. Intenta combinar otros géneros o moods.";
-    }
-
-    if (promptText) {
-      promptHistory.value.unshift(promptText);
-      if (promptHistory.value.length > 5) {
-        promptHistory.value = promptHistory.value.slice(0, 5);
-      }
-    }
-    prompt.value = "";
-  } catch (error: any) {
-    if (error?.status === 401) {
-      promptFeedback.value =
-        "Tu sesión expiró. Redirigiendo al inicio de sesión…";
-      await navigateTo("/login");
-      return;
-    }
-    const message =
-      error?.data?.message ||
-      error?.statusMessage ||
-      "No pudimos generar recomendaciones en este momento.";
-    promptFeedback.value = Array.isArray(message)
-      ? message.join(" ")
-      : message;
-  } finally {
-    isPromptLoading.value = false;
-  }
-};
-
 const itemStates = (item: RecommendationItem) => ({
   favorite: collections.isFavorite(item.tmdbId, item.mediaType),
   seen: collections.isSeen(item.tmdbId, item.mediaType),
@@ -1052,34 +939,31 @@ const itemStates = (item: RecommendationItem) => ({
 const getItemStates = (item?: RecommendationItem | null) =>
   item ? itemStates(item) : { favorite: false, seen: false, wishlist: false };
 
-const buildPayload = (item: RecommendationItem) => ({
-  tmdbId: Number(item.tmdbId),
-  mediaType: item.mediaType || "movie",
-  title: item.title,
-});
+const buildPayload = (item: RecommendationItem) => {
+  const rawId = item.tmdbId;
+  const parsedId =
+    typeof rawId === "number"
+      ? rawId
+      : typeof rawId === "string"
+      ? Number(rawId)
+      : null;
 
-const handlePrompt = async () => {
-  const value = prompt.value.trim();
-  if (!value) {
-    promptFeedback.value =
-      "Describe brevemente qué quieres ver para obtener una lista personalizada.";
-    return;
-  }
-
-  await fetchRecommendations(value);
+  return {
+    tmdbId: parsedId && Number.isFinite(parsedId) ? parsedId : rawId,
+    mediaType: normalizeMediaType(item.mediaType),
+    title: item.title,
+  };
 };
+
 
 const handleFavorite = async (item?: RecommendationItem | null) => {
   if (!item || !item.tmdbId) return;
   try {
     await collections.addFavorite(buildPayload(item));
-    promptFeedback.value = "Agregado a favoritos.";
     fetchFavoritesPreview();
   } catch (error: any) {
     if (error?.status === 401) {
       await navigateTo("/login");
-    } else {
-      promptFeedback.value = "No pudimos guardar en favoritos.";
     }
   }
 };
@@ -1088,13 +972,10 @@ const handleSeen = async (item?: RecommendationItem | null) => {
   if (!item || !item.tmdbId) return;
   try {
     await collections.addSeen(buildPayload(item));
-    promptFeedback.value = "Marcado como visto.";
     fetchSeenPreview();
   } catch (error: any) {
     if (error?.status === 401) {
       await navigateTo("/login");
-    } else {
-      promptFeedback.value = "No pudimos marcar como visto.";
     }
   }
 };
@@ -1103,12 +984,9 @@ const handleWishlist = async (item?: RecommendationItem | null) => {
   if (!item || !item.tmdbId) return;
   try {
     await collections.addWishlist(buildPayload(item));
-    promptFeedback.value = "Añadido a tu wishlist.";
   } catch (error: any) {
     if (error?.status === 401) {
       await navigateTo("/login");
-    } else {
-      promptFeedback.value = "No pudimos añadir a tu wishlist.";
     }
   }
 };
@@ -1141,10 +1019,9 @@ const handleEscapeKey = (event: KeyboardEvent) => {
 onMounted(() => {
   if (process.client) {
     syncAuthState();
-    collections.ensureLoaded();
+    collections.ensureLoaded({ force: true });
     user.value = authUser.value;
     if (authToken.value) {
-      fetchRecommendations(undefined, false);
       fetchDashboardStats();
       fetchFavoritesPreview();
       fetchSeenPreview();
@@ -1189,7 +1066,6 @@ watch(authToken, (token) => {
     stats.recentRecommendations = [];
     favoritesPreview.value = [];
     seenPreview.value = [];
-    topRecommendations.value = [];
     activeRecommendation.value = null;
   }
 });

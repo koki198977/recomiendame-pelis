@@ -2,14 +2,26 @@ import { useAuthToken } from "./useAuthState";
 
 interface CollectionPayload {
   tmdbId: number;
-  mediaType: string;
+  mediaType?: string;
   title?: string;
 }
 
 type CollectionType = "favorites" | "seen" | "wishlist";
 
+const normalizeMediaType = (value?: string) => {
+  if (!value) return "movie";
+  const lowered = value.toLowerCase();
+  if (["tv", "tv_show", "show", "serie", "series"].includes(lowered)) {
+    return "tv";
+  }
+  if (["film", "pelicula", "película"].includes(lowered)) {
+    return "movie";
+  }
+  return lowered;
+};
+
 const keyFor = (tmdbId?: number, mediaType?: string) =>
-  tmdbId ? `${tmdbId}:${mediaType ?? "unknown"}` : "";
+  tmdbId ? `${tmdbId}:${normalizeMediaType(mediaType)}` : "";
 
 const serializePayload = (
   type: CollectionType,
@@ -17,7 +29,7 @@ const serializePayload = (
 ) => {
   const base: Record<string, any> = {
     tmdbId: payload.tmdbId,
-    mediaType: payload.mediaType,
+    mediaType: normalizeMediaType(payload.mediaType),
   };
 
   if (type === "favorites" && payload.title) {
@@ -56,6 +68,14 @@ const normalizeEntries = (items: any): any[] => {
   if (Array.isArray(items)) return items;
   if (items && Array.isArray(items.items)) return items.items;
   if (items && Array.isArray(items.data)) return items.data;
+  if (items && typeof items === "object") {
+    for (const key of Object.keys(items)) {
+      const value = items[key];
+      if (value && Array.isArray(value.items)) {
+        return value.items;
+      }
+    }
+  }
   return [];
 };
 
@@ -77,7 +97,7 @@ const setValues = (type: CollectionType, items: any) => {
   store.value = next;
 };
 
-  const mergeValue = (type: CollectionType, payload: CollectionPayload) => {
+const mergeValue = (type: CollectionType, payload: CollectionPayload) => {
     const store = getStore(type);
     const key = keyFor(payload.tmdbId, payload.mediaType);
     if (key) {
@@ -91,36 +111,43 @@ const setValues = (type: CollectionType, items: any) => {
     return key ? Boolean(store.value[key]) : false;
   };
 
-  const fetchCollection = async (type: CollectionType) => {
-    try {
-      const response = await $fetch<any>(`/${type}`, {
-        baseURL: config.public.apiBase,
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${authToken.value}`,
-        },
-      });
-      setValues(type, response ?? []);
-    } catch (error: any) {
-      // Ignorar si el endpoint no permite GET todavía
-      console.warn(`No se pudo cargar ${type}:`, error?.statusMessage || error);
-    }
-  };
+const fetchCollection = async (type: CollectionType) => {
+  try {
+    const response = await $fetch<any>(`/${type}`, {
+      baseURL: config.public.apiBase,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authToken.value}`,
+      },
+      query: {
+        take: 200,
+        skip: 0,
+        orderBy: "createdAt",
+        order: "desc",
+      },
+    });
+    setValues(type, response ?? []);
+  } catch (error: any) {
+    // Ignorar si el endpoint no permite GET todavía
+    console.warn(`No se pudo cargar ${type}:`, error?.statusMessage || error);
+  }
+};
 
-  const ensureLoaded = async () => {
-    if (loaded.value || loading.value || !authToken.value) return;
-    loading.value = true;
-    try {
-      await Promise.all([
-        fetchCollection("favorites"),
-        fetchCollection("seen"),
-        fetchCollection("wishlist"),
-      ]);
-      loaded.value = true;
-    } finally {
-      loading.value = false;
-    }
-  };
+const ensureLoaded = async (options?: { force?: boolean }) => {
+  const force = options?.force ?? false;
+  if ((!force && loaded.value) || loading.value || !authToken.value) return;
+  loading.value = true;
+  try {
+    await Promise.all([
+      fetchCollection("favorites"),
+      fetchCollection("seen"),
+      fetchCollection("wishlist"),
+    ]);
+    loaded.value = true;
+  } finally {
+    loading.value = false;
+  }
+};
 
   const addTo = async (type: CollectionType, payload: CollectionPayload) => {
     if (!authToken.value) {
@@ -138,6 +165,8 @@ const setValues = (type: CollectionType, items: any) => {
         method: "POST",
         headers: {
           Authorization: `Bearer ${authToken.value}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: serializePayload(type, payload),
       });

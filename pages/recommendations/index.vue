@@ -507,10 +507,16 @@ const activeStates = computed(() => getStates(activeRecommendation.value));
 onMounted(() => {
   if (process.client) {
     syncAuthState();
-    collections.ensureLoaded();
+    collections.ensureLoaded({ force: true });
     if (authToken.value) {
       fetchRecommendations();
     }
+  }
+});
+
+watch(authToken, (token) => {
+  if (token) {
+    collections.ensureLoaded({ force: true });
   }
 });
 
