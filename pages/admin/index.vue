@@ -763,7 +763,7 @@ const fetchActivity = async (options?: { page?: number; limit?: number }) => {
     const requestedPage =
       Number(options?.page ?? activityMeta.value.page ?? 1) || 1;
 
-    const response = await $fetch<any>("/activity", {
+    const response = await $fetch<any>("/activity/admin", {
       baseURL: config.public.apiBase,
       method: "GET",
       headers: {
