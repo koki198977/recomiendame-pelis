@@ -10,6 +10,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
     "/favorites",
     "/wishlist",
     "/profile",
+    "/admin",
   ];
 
   const isProtected = protectedPrefixes.some((path) => to.path.startsWith(path));
@@ -19,6 +20,13 @@ export default defineNuxtRouteMiddleware((to, from) => {
   // Para rutas protegidas sin token, redireccionar al login
   if (isProtected && !token) {
     return navigateTo("/login");
+  }
+
+  if (to.path.startsWith("/admin")) {
+    const isAdmin = localStorage.getItem("recomiendame_admin") === "true";
+    if (!isAdmin) {
+      return navigateTo(token ? "/dashboard" : "/login");
+    }
   }
 
   // No hacer redirección automática desde "/" aquí

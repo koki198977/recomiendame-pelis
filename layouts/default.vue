@@ -258,6 +258,7 @@ import {
   useAuthUser,
   syncAuthState,
   initAuthState,
+  useIsAdmin,
 } from '~/composables/useAuthState';
 
 const mobileMenuOpen = ref(false);
@@ -266,18 +267,27 @@ const router = useRouter();
 
 const tokenState = useAuthToken();
 const userState = useAuthUser();
+const adminState = useIsAdmin();
 const isHydrated = ref(false);
 const isAuthenticated = computed(() => Boolean(tokenState.value) && isHydrated.value);
 
-const authenticatedNav = [
-  { to: '/dashboard', label: 'Inicio' },
-  { to: '/recommendations', label: 'Recomendaciones' },
-  { to: '/recommendations/history', label: 'Historial' },
-  { to: '/seen', label: 'Vistos' },
-  { to: '/favorites', label: 'Favoritos' },
-  { to: '/wishlist', label: 'Wishlist' },
-  { to: '/profile', label: 'Perfil' },
-];
+const authenticatedNav = computed(() => {
+  const entries = [
+    { to: '/dashboard', label: 'Inicio' },
+    { to: '/recommendations', label: 'Recomendaciones' },
+    { to: '/recommendations/history', label: 'Historial' },
+    { to: '/seen', label: 'Vistos' },
+    { to: '/favorites', label: 'Favoritos' },
+    { to: '/wishlist', label: 'Wishlist' },
+    { to: '/profile', label: 'Perfil' },
+  ];
+
+  if (adminState.value) {
+    entries.push({ to: '/admin', label: 'Admin' });
+  }
+
+  return entries;
+});
 
 const navLinkClass = (path: string) => {
   const active =
@@ -293,8 +303,10 @@ const logout = () => {
   localStorage.removeItem('recomiendame_token');
   localStorage.removeItem('recomiendame_refresh');
   localStorage.removeItem('recomiendame_user');
+  localStorage.removeItem('recomiendame_admin');
   tokenState.value = null;
   userState.value = null;
+  adminState.value = false;
   mobileMenuOpen.value = false;
   router.push('/');
 };

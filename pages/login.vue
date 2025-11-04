@@ -104,7 +104,11 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthToken, useAuthUser } from "~/composables/useAuthState";
+import {
+  useAuthToken,
+  useAuthUser,
+  useIsAdmin,
+} from "~/composables/useAuthState";
 
 const form = reactive({
   email: "",
@@ -119,6 +123,7 @@ const successMessage = ref("");
 const config = useRuntimeConfig();
 const authToken = useAuthToken();
 const authUser = useAuthUser();
+const isAdmin = useIsAdmin();
 
 const togglePassword = () => {
   showPassword.value = !showPassword.value;
@@ -159,20 +164,48 @@ const handleSubmit = async () => {
       localStorage.setItem("recomiendame_refresh", response.refresh_token);
     }
     if (response?.user) {
-      localStorage.setItem("recomiendame_user", JSON.stringify(response.user));
-      authUser.value = response.user;
+      const normalizedUser = {
+        ...response.user,
+        admin:
+          typeof response?.admin === "boolean"
+            ? response.admin
+            : response.user?.admin,
+      };
+      localStorage.setItem(
+        "recomiendame_user",
+        JSON.stringify(normalizedUser)
+      );
+      authUser.value = normalizedUser;
     } else {
-      authUser.value = null;
+      const fallbackUser = {
+        email: form.email,
+        admin: Boolean(response?.admin),
+        name: response?.name || form.email?.split("@")?.[0] || "Admin",
+      };
+      localStorage.setItem("recomiendame_user", JSON.stringify(fallbackUser));
+      authUser.value = fallbackUser;
+    }
+
+    if (typeof response?.admin === "boolean") {
+      localStorage.setItem(
+        "recomiendame_admin",
+        response.admin ? "true" : "false"
+      );
+      isAdmin.value = response.admin;
+    } else {
+      localStorage.removeItem("recomiendame_admin");
+      isAdmin.value = false;
     }
 
     successMessage.value = "Acceso concedido. Redirigiendo…";
-    await navigateTo("/dashboard");
+    const destination = response?.admin ? "/admin" : "/dashboard";
+    await navigateTo(destination);
   } catch (error) {
     const message =
       error?.data?.message ||
       error?.statusMessage ||
       "No pudimos iniciar sesión. Verifica tus credenciales.";
-    errorMessage.value = Array.isArray(message) ? message.join(" ") : message;
+      errorMessage.value = Array.isArray(message) ? message.join(" ") : message;
   } finally {
     isSubmitting.value = false;
   }
