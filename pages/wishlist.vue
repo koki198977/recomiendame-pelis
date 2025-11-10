@@ -697,19 +697,34 @@ const handleMarkAsSeen = async (item: WishlistItem) => {
   errorMessage.value = "";
 
   try {
-    // 1. Marcar como visto
-    await $fetch("/seen", {
-      baseURL: config.public.apiBase,
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${authToken.value}`,
-        "Content-Type": "application/json",
-      },
-      body: {
-        tmdbId: item.tmdbId,
-        mediaType: item.mediaType || "movie",
-      },
-    });
+    // 1. Intentar marcar como visto
+    try {
+      await $fetch("/seen", {
+        baseURL: config.public.apiBase,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${authToken.value}`,
+          "Content-Type": "application/json",
+        },
+        body: {
+          tmdbId: item.tmdbId,
+          mediaType: item.mediaType || "movie",
+        },
+      });
+    } catch (seenError: any) {
+      // Si ya está marcado como visto (409 o mensaje específico), continuar
+      const isAlreadySeen = 
+        seenError?.status === 409 || 
+        seenError?.statusCode === 409 ||
+        seenError?.data?.message?.includes("ya está marcado como visto") ||
+        seenError?.message?.includes("ya está marcado como visto");
+      
+      if (!isAlreadySeen) {
+        // Si es otro error, lanzarlo
+        throw seenError;
+      }
+      // Si ya está visto, continuar para eliminarlo de wishlist
+    }
 
     // 2. Eliminar de wishlist
     await $fetch(`/wishlist/${item.tmdbId}`, {
@@ -730,7 +745,7 @@ const handleMarkAsSeen = async (item: WishlistItem) => {
     const message =
       error?.data?.message ||
       error?.statusMessage ||
-      "No se pudo marcar como visto.";
+      "No se pudo completar la operación.";
     errorMessage.value = Array.isArray(message) ? message.join(" ") : message;
   } finally {
     markingAsSeen.value = false;
