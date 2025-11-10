@@ -344,6 +344,13 @@
                   >
                     ▶️ Ver trailer
                   </a>
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="openRating(activeRecommendation)"
+                  >
+                    ⭐ Calificar
+                  </button>
                 </div>
               </div>
             </div>
@@ -355,6 +362,12 @@
       :item="shareTarget"
       :show="Boolean(shareTarget)"
       @close="shareTarget = null"
+    />
+    <RatingDialog
+      :item="ratingTarget"
+      :show="Boolean(ratingTarget)"
+      @close="closeRating"
+      @rated="handleRated"
     />
 
     <!-- Favorites and Seen -->
@@ -480,6 +493,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
 import ShareDialog from "~/components/ShareDialog.vue";
+import RatingDialog from "~/components/RatingDialog.vue";
 import {
   useAuthToken,
   useAuthUser,
@@ -641,6 +655,7 @@ const recentRecommendations = computed(() =>
 const activeRecommendation = ref<RecommendationItem | null>(null);
 const modalContainer = ref<HTMLDivElement | null>(null);
 const shareTarget = ref<RecommendationItem | null>(null);
+const ratingTarget = ref<RecommendationItem | null>(null);
 
 interface FavoritePreviewItem {
   id: string;
@@ -1004,6 +1019,20 @@ const handleWishlist = async (item?: RecommendationItem | null) => {
 const handleShare = (item?: RecommendationItem | null) => {
   if (!item) return;
   shareTarget.value = item;
+};
+
+const openRating = (item?: RecommendationItem | null) => {
+  if (!item) return;
+  ratingTarget.value = item;
+};
+
+const closeRating = () => {
+  ratingTarget.value = null;
+};
+
+const handleRated = () => {
+  // Opcional: refrescar estadísticas
+  fetchDashboardStats();
 };
 
 const openRecommendationDetails = (item: RecommendationItem) => {

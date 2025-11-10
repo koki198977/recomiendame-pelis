@@ -231,6 +231,13 @@
                   >
                     ▶️ Ver trailer
                   </a>
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="openRating(activeRecommendation)"
+                  >
+                    ⭐ Calificar
+                  </button>
                 </div>
               </div>
             </div>
@@ -243,6 +250,12 @@
       :show="Boolean(shareTarget)"
       @close="closeShare"
     />
+    <RatingDialog
+      :item="ratingTarget"
+      :show="Boolean(ratingTarget)"
+      @close="closeRating"
+      @rated="handleRated"
+    />
   </div>
 </template>
 
@@ -250,6 +263,7 @@
 import { nextTick, onBeforeUnmount } from "vue";
 import RecommendationCard from "~/components/RecommendationCard.vue";
 import ShareDialog from "~/components/ShareDialog.vue";
+import RatingDialog from "~/components/RatingDialog.vue";
 import {
   useAuthToken,
   useAuthUser,
@@ -281,6 +295,7 @@ const lastUpdated = ref<string | null>(null);
 const activeRecommendation = ref<RecommendationItem | null>(null);
 const modalContainer = ref<HTMLDivElement | null>(null);
 const shareTarget = ref<RecommendationItem | null>(null);
+const ratingTarget = ref<RecommendationItem | null>(null);
 
 const promptSuggestions = [
   "Películas de terror inteligente con finales sorprendentes",
@@ -500,6 +515,20 @@ const openShare = (item: RecommendationItem) => {
 
 const closeShare = () => {
   shareTarget.value = null;
+};
+
+const openRating = (item: RecommendationItem | null) => {
+  if (!item) return;
+  ratingTarget.value = item;
+};
+
+const closeRating = () => {
+  ratingTarget.value = null;
+};
+
+const handleRated = () => {
+  // Opcional: refrescar recomendaciones o mostrar feedback
+  setFeedback("success", "¡Gracias por tu calificación!");
 };
 
 const activeStates = computed(() => getStates(activeRecommendation.value));
