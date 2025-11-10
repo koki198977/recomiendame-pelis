@@ -285,6 +285,7 @@ import ShareDialog from "~/components/ShareDialog.vue";
 import RatingDialog from "~/components/RatingDialog.vue";
 import { useAuthToken, syncAuthState } from "~/composables/useAuthState";
 import { useCollections } from "~/composables/useCollections";
+import { useRatings } from "~/composables/useRatings";
 
 interface HistoryItem {
   id?: string;
@@ -304,6 +305,7 @@ interface HistoryItem {
 const authToken = useAuthToken();
 const config = useRuntimeConfig();
 const collections = useCollections();
+const ratings = useRatings();
 
 const history = ref<HistoryItem[]>([]);
 const isLoading = ref(false);
@@ -537,6 +539,7 @@ onMounted(() => {
   if (process.client) {
     syncAuthState();
     collections.ensureLoaded();
+    ratings.fetchRatings();
     fetchHistory();
     
     // Agregar listener global para escape

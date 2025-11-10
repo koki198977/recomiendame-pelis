@@ -270,6 +270,7 @@ import {
   syncAuthState,
 } from "~/composables/useAuthState";
 import { useCollections } from "~/composables/useCollections";
+import { useRatings } from "~/composables/useRatings";
 
 interface RecommendationItem {
   id?: string;
@@ -308,6 +309,7 @@ const authToken = useAuthToken();
 const authUser = useAuthUser();
 const config = useRuntimeConfig();
 const collections = useCollections();
+const ratings = useRatings();
 
 const placeholderImage = "https://placehold.co/200x300/1A0F59/FFFFFF?text=Recomiendame";
 
@@ -537,6 +539,7 @@ onMounted(() => {
   if (process.client) {
     syncAuthState();
     collections.ensureLoaded({ force: true });
+    ratings.fetchRatings();
     if (authToken.value) {
       fetchRecommendations();
     }
@@ -546,6 +549,7 @@ onMounted(() => {
 watch(authToken, (token) => {
   if (token) {
     collections.ensureLoaded({ force: true });
+    ratings.fetchRatings();
   }
 });
 

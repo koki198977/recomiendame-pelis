@@ -9,7 +9,9 @@
         <div class="w-full max-w-md rounded-3xl border border-white/10 bg-surface-900 p-6 shadow-strong sm:p-8">
           <div class="space-y-6">
             <div>
-              <h2 class="text-2xl font-semibold">Calificar</h2>
+              <h2 class="text-2xl font-semibold">
+                {{ isEditing ? 'Editar calificación' : 'Calificar' }}
+              </h2>
               <p class="mt-2 text-sm text-white/60">
                 {{ item?.title }}
               </p>
@@ -112,6 +114,7 @@
 
 <script setup lang="ts">
 import { useAuthToken } from "~/composables/useAuthState";
+import { useRatings } from "~/composables/useRatings";
 
 interface RatingItem {
   tmdbId?: number;
@@ -131,12 +134,14 @@ const emit = defineEmits<{
 
 const authToken = useAuthToken();
 const config = useRuntimeConfig();
+const ratings = useRatings();
 
 const rating = ref(0);
 const comment = ref("");
 const isSubmitting = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
+const isEditing = ref(false);
 
 const normalizeMediaType = (value?: string | null) => {
   if (!value) return "movie";
@@ -176,7 +181,13 @@ const submitRating = async () => {
       body,
     });
 
-    successMessage.value = "¡Calificación enviada exitosamente!";
+    successMessage.value = isEditing.value 
+      ? "¡Calificación actualizada exitosamente!" 
+      : "¡Calificación enviada exitosamente!";
+    
+    // Actualizar el cache local
+    await ratings.fetchRatings({ force: true });
+    
     emit("rated");
     
     // Cerrar el diálogo después de 1.5 segundos
@@ -194,11 +205,19 @@ const submitRating = async () => {
   }
 };
 
-// Reset form when dialog opens/closes
+// Load existing rating when dialog opens
 watch(() => props.show, (newShow) => {
-  if (newShow) {
-    rating.value = 0;
-    comment.value = "";
+  if (newShow && props.item?.tmdbId) {
+    const existingRating = ratings.getRating(props.item.tmdbId);
+    if (existingRating) {
+      rating.value = existingRating.rating;
+      comment.value = existingRating.comment || "";
+      isEditing.value = true;
+    } else {
+      rating.value = 0;
+      comment.value = "";
+      isEditing.value = false;
+    }
     errorMessage.value = "";
     successMessage.value = "";
   }

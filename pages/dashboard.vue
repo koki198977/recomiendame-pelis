@@ -500,6 +500,7 @@ import {
   syncAuthState,
 } from "~/composables/useAuthState";
 import { useCollections } from "~/composables/useCollections";
+import { useRatings } from "~/composables/useRatings";
 
 interface RecommendationItem {
   id?: string;
@@ -643,6 +644,7 @@ const authToken = useAuthToken();
 const authUser = useAuthUser();
 const config = useRuntimeConfig();
 const collections = useCollections();
+const ratings = useRatings();
 
 const FAVORITES_PREVIEW_FETCH_LIMIT = 200;
 const FAVORITES_PREVIEW_DISPLAY = 3;
@@ -1059,6 +1061,7 @@ onMounted(() => {
   if (process.client) {
     syncAuthState();
     collections.ensureLoaded({ force: true });
+    ratings.fetchRatings();
     user.value = authUser.value;
     if (authToken.value) {
       fetchDashboardStats();

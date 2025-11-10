@@ -16,12 +16,22 @@
     <div class="space-y-4 p-5 sm:p-6">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
         <h3 class="text-base font-semibold text-white sm:text-lg">{{ item.title }}</h3>
-        <span
-          v-if="item.voteAverage"
-          class="inline-flex items-center gap-1 self-start rounded-full bg-secondary-500/20 px-3 py-1 text-xs font-semibold text-secondary-100"
-        >
-          ⭐ {{ item.voteAverage.toFixed(1) }}
-        </span>
+        <div class="flex flex-wrap gap-2">
+          <span
+            v-if="userRating"
+            class="inline-flex items-center gap-1 self-start rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-semibold text-yellow-100"
+            title="Tu calificación"
+          >
+            ⭐ {{ userRating.rating }}/5
+          </span>
+          <span
+            v-if="item.voteAverage"
+            class="inline-flex items-center gap-1 self-start rounded-full bg-secondary-500/20 px-3 py-1 text-xs font-semibold text-secondary-100"
+            title="Calificación promedio"
+          >
+            ⭐ {{ item.voteAverage.toFixed(1) }}
+          </span>
+        </div>
       </div>
       <p v-if="item.reason" class="text-xs uppercase tracking-[0.3em] text-white/40">
         {{ item.reason }}
@@ -127,6 +137,8 @@
 </template>
 
 <script setup lang="ts">
+import { useRatings } from "~/composables/useRatings";
+
 interface RecommendationCardItem {
   id?: string;
   tmdbId?: number;
@@ -171,6 +183,13 @@ const emit = defineEmits<{
   (e: "mark-wishlist", item: RecommendationCardItem): void;
   (e: "share", item: RecommendationCardItem): void;
 }>();
+
+const ratings = useRatings();
+
+const userRating = computed(() => {
+  if (!props.item.tmdbId) return null;
+  return ratings.getRating(props.item.tmdbId);
+});
 
 const imageSrc = computed(
   () =>
