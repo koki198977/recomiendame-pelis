@@ -138,6 +138,15 @@ const isSubmitting = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 
+const normalizeMediaType = (value?: string | null) => {
+  if (!value) return "movie";
+  const lowered = value.toString().trim().toLowerCase();
+  if (["tv", "tv_show", "show", "serie", "series", "tvshow"].includes(lowered)) {
+    return "tv";
+  }
+  return "movie";
+};
+
 const submitRating = async () => {
   if (!props.item?.tmdbId || rating.value === 0) return;
 
@@ -146,6 +155,17 @@ const submitRating = async () => {
   successMessage.value = "";
 
   try {
+    const body: any = {
+      tmdbId: props.item.tmdbId,
+      mediaType: normalizeMediaType(props.item.mediaType),
+      rating: rating.value,
+    };
+
+    // Solo agregar comment si tiene contenido
+    if (comment.value.trim()) {
+      body.comment = comment.value.trim();
+    }
+
     await $fetch("/ratings", {
       baseURL: config.public.apiBase,
       method: "POST",
@@ -153,11 +173,7 @@ const submitRating = async () => {
         Authorization: `Bearer ${authToken.value}`,
         "Content-Type": "application/json",
       },
-      body: {
-        tmdbId: props.item.tmdbId,
-        rating: rating.value,
-        comment: comment.value.trim() || undefined,
-      },
+      body,
     });
 
     successMessage.value = "¡Calificación enviada exitosamente!";
