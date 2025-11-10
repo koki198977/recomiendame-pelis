@@ -25,7 +25,7 @@
               Tus estadísticas se actualizan automáticamente según tu actividad reciente.
             </p>
           </div>
-          <div class="grid grid-cols-2 gap-4 sm:gap-6 w-full lg:w-auto max-w-lg">
+          <div class="grid grid-cols-2 gap-4 sm:gap-6 w-full lg:w-auto lg:max-w-2xl">
             <div
               v-for="card in statCards"
               :key="card.label"
@@ -566,35 +566,18 @@ const statCards = computed(() => {
       accent: "text-secondary-200",
     },
     {
-      label: "Evaluaciones",
+      label: "Calificaciones",
       value: stats.ratingsTotal != null ? stats.ratingsTotal : "—",
-      description: "Calificaciones que ayudan a mejorar las sugerencias.",
-      accent: "text-accent-200",
+      description: "Contenido que has calificado.",
+      accent: "text-yellow-200",
+    },
+    {
+      label: "Rating promedio",
+      value: stats.averageRating != null ? `⭐ ${stats.averageRating.toFixed(1)}` : "—",
+      description: "Tu puntaje promedio de calificaciones.",
+      accent: "text-yellow-100",
     },
   ];
-
-  if (stats.averageRating != null) {
-    cards.push({
-      label: "Promedio rating",
-      value: stats.averageRating.toFixed(1),
-      description: "Puntaje promedio que otorgas al contenido.",
-      accent: "text-white",
-    });
-  } else if (stats.matchScore != null) {
-    cards.push({
-      label: "Matchscore IA",
-      value: `${Math.round(stats.matchScore)}%`,
-      description: "Precisión estimada de tus recomendaciones.",
-      accent: "text-primary-300",
-    });
-  } else {
-    cards.push({
-      label: "Promedio rating",
-      value: "—",
-      description: "Puntaje promedio que otorgas al contenido.",
-      accent: "text-white",
-    });
-  }
 
   return cards;
 });
