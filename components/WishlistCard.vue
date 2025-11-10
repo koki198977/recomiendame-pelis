@@ -1,10 +1,17 @@
 <template>
-  <div class="card-hover overflow-hidden p-0">
-    <div class="relative">
+  <article
+    class="card-hover flex h-full cursor-pointer flex-col overflow-hidden p-0 transition hover:-translate-y-1 hover:shadow-medium focus:outline-none focus-visible:-translate-y-1 focus-visible:ring-2 focus-visible:ring-primary-400"
+    role="button"
+    tabindex="0"
+    @click="$emit('view-details', item)"
+    @keydown.enter.prevent="$emit('view-details', item)"
+    @keydown.space.prevent="$emit('view-details', item)"
+  >
+    <div class="relative aspect-[2/3] w-full overflow-hidden">
       <img
         :src="posterSrc"
         :alt="`Poster de ${item.title}`"
-        class="h-48 w-full object-cover sm:h-52"
+        class="h-full w-full object-cover"
       />
       <span
         class="absolute left-4 top-4 inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white/70 backdrop-blur"
@@ -12,66 +19,18 @@
         {{ mediaBadge }}
       </span>
     </div>
-    <div class="space-y-3 p-5 sm:p-6">
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-        <h3 class="text-base font-semibold text-white sm:text-lg">{{ item.title }}</h3>
+    <div class="flex flex-1 flex-col space-y-3 p-5 sm:p-6">
+      <div class="flex flex-col gap-2">
+        <h3 class="text-base font-semibold text-white sm:text-lg line-clamp-2">{{ item.title }}</h3>
         <span v-if="item.addedAt" class="text-xs text-white/40">
           {{ formattedDate }}
         </span>
       </div>
-      <p v-if="item.overview" class="text-sm leading-relaxed text-white/60">
-        {{ item.overview }}
-      </p>
-      <div v-if="platforms.length" class="flex flex-wrap gap-2">
-        <span
-          v-for="platform in platforms"
-          :key="platform"
-          class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70"
-        >
-          {{ platform }}
-        </span>
-      </div>
-      <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
-        <button
-          v-if="item.tmdbId"
-          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-primary-500/20 sm:w-auto sm:text-xs sm:py-1.5"
-          @click="$emit('share', item)"
-        >
-          🔗 Compartir
-        </button>
-        <button
-          class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-500/20 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40 sm:w-auto sm:text-xs sm:py-1.5"
-          :disabled="deleting"
-          @click="$emit('remove')"
-        >
-          <span v-if="!deleting">Eliminar</span>
-          <span v-else class="flex items-center gap-1">
-            <svg
-              class="h-3 w-3 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            Borrando…
-          </span>
-        </button>
+      <div class="mt-auto pt-2">
+        <p class="text-xs text-white/50 text-center">Click para ver detalles</p>
       </div>
     </div>
-  </div>
+  </article>
 </template>
 
 <script setup lang="ts">
@@ -92,6 +51,7 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
+  (e: "view-details", item: WishlistItem): void;
   (e: "remove"): void;
   (e: "share", item: WishlistItem): void;
 }>();
