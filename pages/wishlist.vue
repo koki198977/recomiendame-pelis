@@ -194,6 +194,37 @@
                   </button>
                   <button
                     type="button"
+                    class="inline-flex items-center gap-2 rounded-full bg-accent-500/20 px-4 py-2 text-sm font-semibold text-accent-100 transition hover:bg-accent-500/30 disabled:opacity-40"
+                    :disabled="markingAsSeen"
+                    @click="selectedItem ? handleMarkAsSeen(selectedItem) : null"
+                  >
+                    <span v-if="!markingAsSeen">👀 Marcar como visto</span>
+                    <span v-else class="flex items-center gap-1">
+                      <svg
+                        class="h-3 w-3 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Marcando…
+                    </span>
+                  </button>
+                  <button
+                    type="button"
                     class="inline-flex items-center gap-2 rounded-full bg-red-500/20 px-4 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40"
                     :disabled="deletingId === String(selectedItem?.tmdbId)"
                     @click="selectedItem ? handleRemoveFromDetails(selectedItem) : null"
@@ -407,6 +438,7 @@ const isLoading = ref(false);
 const errorMessage = ref("");
 const wishlistItems = ref<WishlistItem[]>([]);
 const deletingId = ref<string | undefined>();
+const markingAsSeen = ref(false);
 
 const addModalOpen = ref(false);
 const addSearchQuery = ref("");
@@ -656,6 +688,53 @@ const closeRating = () => {
 const handleRated = () => {
   // Actualizar ratings
   ratings.fetchRatings({ force: true });
+};
+
+const handleMarkAsSeen = async (item: WishlistItem) => {
+  if (!authToken.value || !item.tmdbId) return;
+
+  markingAsSeen.value = true;
+  errorMessage.value = "";
+
+  try {
+    // 1. Marcar como visto
+    await $fetch("/seen", {
+      baseURL: config.public.apiBase,
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken.value}`,
+        "Content-Type": "application/json",
+      },
+      body: {
+        tmdbId: item.tmdbId,
+        mediaType: item.mediaType || "movie",
+      },
+    });
+
+    // 2. Eliminar de wishlist
+    await $fetch(`/wishlist/${item.tmdbId}`, {
+      baseURL: config.public.apiBase,
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authToken.value}`,
+      },
+    });
+
+    // 3. Actualizar colecciones
+    await syncCollections();
+
+    // 4. Cerrar modal y refrescar lista
+    closeDetails();
+    await fetchWishlist();
+  } catch (error: any) {
+    const message =
+      error?.data?.message ||
+      error?.statusMessage ||
+      "No se pudo marcar como visto.";
+    errorMessage.value = Array.isArray(message) ? message.join(" ") : message;
+  } finally {
+    markingAsSeen.value = false;
+  }
 };
 
 const performAddSearch = async () => {
