@@ -164,6 +164,15 @@
                   </span>
                 </div>
                 <div class="flex flex-wrap gap-2">
+                  <a
+                    v-if="selectedItem?.trailerUrl"
+                    :href="selectedItem.trailerUrl"
+                    target="_blank"
+                    rel="noopener"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                  >
+                    ▶️ Ver trailer
+                  </a>
                   <button
                     type="button"
                     class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
