@@ -144,6 +144,13 @@
                   </h3>
                 </div>
                 <div class="flex flex-wrap items-center gap-4 text-sm text-white/70">
+                  <span
+                    v-if="userRating"
+                    class="inline-flex items-center gap-1 rounded-full bg-yellow-500/20 px-3 py-1 text-xs font-semibold text-yellow-100"
+                    title="Tu calificación"
+                  >
+                    ⭐ {{ userRating.rating }}/5
+                  </span>
                   <span v-if="selectedItem?.seenAt" class="text-xs text-white/50">
                     Visto: {{ formatDetailDate(selectedItem.seenAt) }}
                   </span>
@@ -173,6 +180,13 @@
                   >
                     ▶️ Ver trailer
                   </a>
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="selectedItem ? openRating(selectedItem) : null"
+                  >
+                    ⭐ Calificar
+                  </button>
                   <button
                     type="button"
                     class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
@@ -363,14 +377,22 @@
       :show="Boolean(shareTarget)"
       @close="shareTarget = null"
     />
+    <RatingDialog
+      :item="ratingTarget"
+      :show="Boolean(ratingTarget)"
+      @close="closeRating"
+      @rated="handleRated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAuthToken, syncAuthState } from "~/composables/useAuthState";
 import { useCollections } from "~/composables/useCollections";
+import { useRatings } from "~/composables/useRatings";
 import SeenCard from "~/components/SeenCard.vue";
 import ShareDialog from "~/components/ShareDialog.vue";
+import RatingDialog from "~/components/RatingDialog.vue";
 import { nextTick, onBeforeUnmount } from "vue";
 
 interface SeenItem {
@@ -388,6 +410,7 @@ interface SeenItem {
 const authToken = useAuthToken();
 const config = useRuntimeConfig();
 const collections = useCollections();
+const ratings = useRatings();
 
 const isLoading = ref(false);
 const errorMessage = ref("");
@@ -403,8 +426,14 @@ const shareTarget = ref<SeenItem | null>(null);
 
 const selectedItem = ref<SeenItem | null>(null);
 const modalContainer = ref<HTMLDivElement | null>(null);
+const ratingTarget = ref<SeenItem | null>(null);
 
 const placeholderImage = "https://placehold.co/200x300/1A0F59/FFFFFF?text=Recomiendame";
+
+const userRating = computed(() => {
+  if (!selectedItem.value?.tmdbId) return null;
+  return ratings.getRating(selectedItem.value.tmdbId);
+});
 
 const filters = reactive({
   search: "",
@@ -623,6 +652,20 @@ const handleRemoveFromDetails = async (item: SeenItem) => {
   }
 };
 
+const openRating = (item: SeenItem | null) => {
+  if (!item) return;
+  ratingTarget.value = item;
+};
+
+const closeRating = () => {
+  ratingTarget.value = null;
+};
+
+const handleRated = () => {
+  // Actualizar ratings
+  ratings.fetchRatings({ force: true });
+};
+
 const performAddSearch = async () => {
   const term = addSearchQuery.value.trim();
   if (!term) {
@@ -732,6 +775,7 @@ onMounted(() => {
   if (process.client) {
     syncAuthState();
     syncCollections();
+    ratings.fetchRatings();
     fetchSeen();
     
     // Agregar listener global para escape
