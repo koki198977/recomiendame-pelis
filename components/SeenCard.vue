@@ -1,94 +1,36 @@
 <template>
-  <div class="card-hover h-full overflow-hidden">
-    <div class="relative h-52 w-full overflow-hidden rounded-3xl sm:h-48">
+  <article
+    class="card-hover flex h-full cursor-pointer flex-col overflow-hidden p-0 transition hover:-translate-y-1 hover:shadow-medium focus:outline-none focus-visible:-translate-y-1 focus-visible:ring-2 focus-visible:ring-primary-400"
+    role="button"
+    tabindex="0"
+    @click="$emit('view-details', item)"
+    @keydown.enter.prevent="$emit('view-details', item)"
+    @keydown.space.prevent="$emit('view-details', item)"
+  >
+    <div class="relative aspect-[2/3] w-full overflow-hidden">
       <img
         :src="posterSrc"
         :alt="`Poster de ${item.title}`"
         class="h-full w-full object-cover"
       />
       <span
-        class="absolute left-3 top-3 inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white/70 backdrop-blur"
+        class="absolute left-4 top-4 inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white/70 backdrop-blur"
       >
         {{ mediaBadge }}
       </span>
     </div>
-    <div class="space-y-3 pt-4">
+    <div class="flex flex-1 flex-col space-y-3 p-5 sm:p-6">
       <div class="flex flex-col gap-2">
-        <div class="flex items-center justify-between">
-          <p class="text-xs uppercase tracking-[0.3em] text-white/40">
-            {{ formattedDate }}
-          </p>
-        </div>
-        <h3 class="text-base font-semibold sm:text-lg">{{ item.title }}</h3>
-      </div>
-      
-      <div v-if="platforms.length" class="flex flex-wrap gap-2">
-        <span
-          v-for="platform in platforms"
-          :key="platform"
-          class="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70"
-        >
-          {{ platform }}
+        <h3 class="text-base font-semibold text-white sm:text-lg line-clamp-2">{{ item.title }}</h3>
+        <span class="text-xs text-white/40">
+          {{ formattedDate }}
         </span>
       </div>
-
-      <div v-if="item.reason" class="space-y-2">
-        <p v-if="!showFullReason" class="text-sm text-white/60 leading-relaxed line-clamp-2">
-          {{ item.reason }}
-        </p>
-        <p v-else class="text-sm text-white/60 leading-relaxed">
-          {{ item.reason }}
-        </p>
-        <button
-          v-if="item.reason && item.reason.length > 100"
-          class="text-xs font-semibold text-primary-200 hover:text-primary-100 transition"
-          @click="showFullReason = !showFullReason"
-        >
-          {{ showFullReason ? 'Ver menos' : 'Ver más' }}
-        </button>
-      </div>
-
-      <div class="flex flex-col gap-2 pt-2 border-t border-white/10">
-        <button
-          v-if="item.tmdbId"
-          class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm font-semibold text-white/70 transition hover:bg-primary-500/20"
-          @click="$emit('share', item)"
-        >
-          🔗 Compartir
-        </button>
-        <button
-          class="inline-flex w-full items-center justify-center rounded-full bg-red-500/20 px-3 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40"
-          :disabled="deleting"
-          @click="$emit('remove')"
-        >
-          <span v-if="!deleting">Eliminar</span>
-          <span v-else class="flex items-center gap-1">
-            <svg
-              class="h-3 w-3 animate-spin"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            Borrando…
-          </span>
-        </button>
+      <div class="mt-auto pt-2">
+        <p class="text-xs text-white/50 text-center">Click para ver detalles</p>
       </div>
     </div>
-  </div>
+  </article>
 </template>
 
 <script setup lang="ts">
@@ -110,11 +52,10 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
+  (e: "view-details", item: SeenItem): void;
   (e: "remove"): void;
   (e: "share", item: SeenItem): void;
 }>();
-
-const showFullReason = ref(false);
 
 const posterSrc = computed(
   () =>

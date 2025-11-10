@@ -1,10 +1,10 @@
 <template>
   <div class="card-hover overflow-hidden p-0">
-    <div class="relative">
+    <div class="relative aspect-[2/3] w-full overflow-hidden">
       <img
         :src="imageSrc"
         :alt="`Poster de ${item.title}`"
-        class="h-48 w-full object-cover sm:h-56"
+        class="h-full w-full object-cover"
       />
       <span
         v-if="mediaBadge"

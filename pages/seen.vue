@@ -66,6 +66,7 @@
               :key="item.id"
               :item="item"
               :deleting="deletingId === String(item.recordId ?? item.tmdbId)"
+              @view-details="openDetails"
               @remove="handleRemove(item)"
               @share="handleShare(item)"
             />
@@ -102,6 +103,121 @@
         </div>
       </div>
     </section>
+
+    <!-- Modal de detalles -->
+    <Teleport to="body">
+      <transition name="fade">
+        <div
+          v-if="selectedItem"
+          ref="modalContainer"
+          class="fixed inset-0 z-[998] flex items-center justify-center bg-surface-950/90 px-4 py-6 sm:px-6 sm:py-10 backdrop-blur-md"
+          tabindex="-1"
+          @click="handleBackdropClick"
+        >
+          <div 
+            class="relative flex w-full max-w-3xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-surface-900 shadow-strong max-h-[92vh]"
+            @click.stop
+          >
+            <button
+              type="button"
+              class="absolute right-4 top-4 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white/70 transition hover:bg-white/20 hover:text-white"
+              @click="closeDetails"
+              aria-label="Cerrar detalles"
+            >
+              ✕
+            </button>
+            <div class="grid flex-1 gap-6 overflow-y-auto p-6 sm:p-8 md:grid-cols-[220px_1fr] md:overflow-visible">
+              <div class="overflow-hidden rounded-3xl border border-white/10">
+                <img
+                  :src="selectedItem?.posterUrl || placeholderImage"
+                  :alt="selectedItem?.title"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.3em] text-white/40">
+                    {{ selectedItem?.mediaType === "tv" ? "Serie" : "Película" }}
+                  </p>
+                  <h3 class="mt-2 text-2xl font-semibold">
+                    {{ selectedItem?.title }}
+                  </h3>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-white/70">
+                  <span v-if="selectedItem?.seenAt" class="text-xs text-white/50">
+                    Visto: {{ formatDetailDate(selectedItem.seenAt) }}
+                  </span>
+                </div>
+                <p v-if="selectedItem?.reason" class="text-sm leading-relaxed text-white/80">
+                  {{ selectedItem.reason }}
+                </p>
+                <p v-else class="text-sm leading-relaxed text-white/60 italic">
+                  Sin descripción disponible.
+                </p>
+                <div v-if="selectedItem?.platforms?.length" class="flex flex-wrap gap-2">
+                  <span
+                    v-for="platform in selectedItem.platforms"
+                    :key="platform"
+                    class="rounded-full bg-white/10 px-3 py-1 text-xs text-white/70"
+                  >
+                    {{ platform }}
+                  </span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                    @click="selectedItem ? handleShare(selectedItem) : null"
+                  >
+                    🔗 Compartir
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-full bg-red-500/20 px-4 py-2 text-sm font-semibold text-red-200 transition hover:bg-red-500/30 disabled:opacity-40"
+                    :disabled="deletingId === String(selectedItem?.recordId ?? selectedItem?.tmdbId)"
+                    @click="selectedItem ? handleRemoveFromDetails(selectedItem) : null"
+                  >
+                    <span v-if="deletingId !== String(selectedItem?.recordId ?? selectedItem?.tmdbId)">🗑️ Eliminar de vistos</span>
+                    <span v-else class="flex items-center gap-1">
+                      <svg
+                        class="h-3 w-3 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          class="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          stroke-width="4"
+                        ></circle>
+                        <path
+                          class="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      Eliminando…
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="border-t border-white/10 bg-surface-900/80 px-6 pb-6 pt-4 sm:px-8">
+              <button
+                type="button"
+                class="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+                @click="closeDetails"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </Teleport>
 
     <transition name="fade">
       <div
@@ -246,6 +362,7 @@ import { useAuthToken, syncAuthState } from "~/composables/useAuthState";
 import { useCollections } from "~/composables/useCollections";
 import SeenCard from "~/components/SeenCard.vue";
 import ShareDialog from "~/components/ShareDialog.vue";
+import { nextTick, onBeforeUnmount } from "vue";
 
 interface SeenItem {
   id: string;
@@ -274,6 +391,11 @@ const addSearchLoading = ref(false);
 const addSearchError = ref("");
 const addInProgress = ref<number | null>(null);
 const shareTarget = ref<SeenItem | null>(null);
+
+const selectedItem = ref<SeenItem | null>(null);
+const modalContainer = ref<HTMLDivElement | null>(null);
+
+const placeholderImage = "https://placehold.co/200x300/1A0F59/FFFFFF?text=Recomiendame";
 
 const filters = reactive({
   search: "",
@@ -454,6 +576,44 @@ const formatYear = (date?: string) => {
   return new Date(date).getFullYear();
 };
 
+const formatDetailDate = (date?: string) => {
+  if (!date) return "Fecha desconocida";
+  try {
+    return new Intl.DateTimeFormat("es-CL", {
+      dateStyle: "medium",
+    }).format(new Date(date));
+  } catch {
+    return date;
+  }
+};
+
+const openDetails = (item: SeenItem) => {
+  selectedItem.value = item;
+};
+
+const closeDetails = () => {
+  selectedItem.value = null;
+};
+
+const handleBackdropClick = (event: MouseEvent) => {
+  if (event.target === event.currentTarget) {
+    closeDetails();
+  }
+};
+
+const handleEscapeKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && selectedItem.value) {
+    closeDetails();
+  }
+};
+
+const handleRemoveFromDetails = async (item: SeenItem) => {
+  await handleRemove(item);
+  if (!deletingId.value) {
+    closeDetails();
+  }
+};
+
 const performAddSearch = async () => {
   const term = addSearchQuery.value.trim();
   if (!term) {
@@ -546,11 +706,36 @@ watch(addSearchQuery, (value) => {
   }
 });
 
+watch(selectedItem, (value) => {
+  if (process.client) {
+    if (value) {
+      // Prevenir scroll del body
+      document.body.style.overflow = 'hidden';
+      nextTick(() => modalContainer.value?.focus());
+    } else {
+      // Restaurar scroll del body
+      document.body.style.overflow = '';
+    }
+  }
+});
+
 onMounted(() => {
   if (process.client) {
     syncAuthState();
     syncCollections();
     fetchSeen();
+    
+    // Agregar listener global para escape
+    document.addEventListener('keydown', handleEscapeKey);
+  }
+});
+
+onBeforeUnmount(() => {
+  // Remover listener global
+  if (process.client) {
+    document.removeEventListener('keydown', handleEscapeKey);
+    // Restaurar scroll del body por si acaso
+    document.body.style.overflow = '';
   }
 });
 
