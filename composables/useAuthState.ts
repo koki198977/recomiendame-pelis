@@ -55,3 +55,22 @@ export const initAuthState = () => {
     syncAuthState();
   }
 };
+
+export const clearAuthState = () => {
+  if (!process.client) return;
+  
+  const tokenState = useAuthToken();
+  const userState = useAuthUser();
+  const adminState = useIsAdmin();
+
+  // Limpiar localStorage
+  localStorage.removeItem("recomiendame_token");
+  localStorage.removeItem("recomiendame_refresh");
+  localStorage.removeItem("recomiendame_user");
+  localStorage.removeItem("recomiendame_admin");
+
+  // Limpiar estados
+  tokenState.value = null;
+  userState.value = null;
+  adminState.value = false;
+};
