@@ -166,6 +166,9 @@ const availableGenres = [
   "Historia",
   "Fantasía",
   "Suspenso",
+  "Bélico",
+  "Western",
+  "Musical",
 ];
 
 const userData = reactive<UserProfile>({

@@ -158,6 +158,9 @@ const availableGenres = [
   "Historia",
   "Fantasía",
   "Suspenso",
+  "Bélico",
+  "Western",
+  "Musical",
 ];
 
 const form = reactive({
