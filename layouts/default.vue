@@ -220,6 +220,13 @@
             <ul class="mt-4 space-y-2 text-sm">
               <li>
                 <NuxtLink
+                  to="/contact"
+                  class="text-white/70 hover:text-white transition"
+                  >Contacto</NuxtLink
+                >
+              </li>
+              <li>
+                <NuxtLink
                   to="/privacy"
                   class="text-white/70 hover:text-white transition"
                   >Privacidad</NuxtLink
