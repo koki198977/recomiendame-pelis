@@ -256,9 +256,9 @@ const handleSubmit = async () => {
       }
     }, 100)
     
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error al enviar mensaje:', err)
-    error.value = err.data?.statusMessage || 'Hubo un error al enviar el mensaje. Por favor intenta de nuevo o escríbenos directamente a recomiendameappcl@gmail.com'
+    error.value = err?.data?.statusMessage || 'Hubo un error al enviar el mensaje. Por favor intenta de nuevo o escríbenos directamente a recomiendameappcl@gmail.com'
   } finally {
     loading.value = false
   }
