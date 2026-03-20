@@ -26,7 +26,7 @@
       </div>
 
       <!-- Grid de favoritos -->
-      <div v-else-if="favorites.length" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div v-if="!isLoading && !errorMessage && favorites.length" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <article
           v-for="item in favorites"
           :key="item.id"
@@ -64,8 +64,24 @@
         </article>
       </div>
 
+      <!-- Mostrar más -->
+      <div v-if="hasMore" class="flex justify-center pt-2">
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 disabled:opacity-50"
+          :disabled="isLoadingMore"
+          @click="loadMore"
+        >
+          <svg v-if="isLoadingMore" class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+          </svg>
+          {{ isLoadingMore ? 'Cargando...' : `Mostrar más (${total - favorites.length} restantes)` }}
+        </button>
+      </div>
+
       <!-- Vacío -->
-      <div v-else class="rounded-3xl border border-white/10 bg-white/5 px-6 py-12 text-center text-sm text-white/60">
+      <div v-if="!isLoading && !errorMessage && !favorites.length" class="rounded-3xl border border-white/10 bg-white/5 px-6 py-12 text-center text-sm text-white/60">
         Este usuario no tiene favoritos públicos aún.
       </div>
 
@@ -210,13 +226,34 @@ const route = useRoute();
 const config = useRuntimeConfig();
 
 const userId = computed(() => route.params.userId as string);
+const TAKE = 12;
 const isLoading = ref(true);
 const errorMessage = ref("");
 const favorites = ref<FavoriteItem[]>([]);
+const total = ref(0);
+const isLoadingMore = ref(false);
 const showStoreLinks = ref(false);
 const selectedItem = ref<FavoriteItem | null>(null);
 
 const placeholder = "https://placehold.co/400x600/1A0F59/FFFFFF?text=Recomiendame";
+
+const currentPage = ref(1);
+const totalPages = ref(1);
+
+const mapItems = (rawItems: any[]): FavoriteItem[] =>
+  rawItems.map((entry: any) => {
+    const tmdb = entry.tmdb ?? {};
+    return {
+      id: String(entry.id ?? entry.tmdbId),
+      tmdbId: entry.tmdbId,
+      mediaType: tmdb.mediaType ?? entry.mediaType ?? "movie",
+      title: tmdb.title ?? entry.title ?? "Título desconocido",
+      posterUrl: tmdb.posterUrl ?? entry.posterUrl,
+      overview: tmdb.overview ?? entry.overview,
+      platforms: tmdb.platforms ?? entry.platforms ?? [],
+      trailerUrl: tmdb.trailerUrl ?? entry.trailerUrl,
+    } as FavoriteItem;
+  });
 
 const fetchSharedFavorites = async () => {
   isLoading.value = true;
@@ -225,25 +262,12 @@ const fetchSharedFavorites = async () => {
   try {
     const response = await $fetch<any>(`/favorites/shared/${userId.value}`, {
       baseURL: config.public.apiBase,
+      params: { take: TAKE, skip: 0 },
     });
 
-    const rawItems = Array.isArray(response)
-      ? response
-      : response?.favorites?.items ?? response?.items ?? [];
-
-    favorites.value = rawItems.map((entry: any) => {
-      const tmdb = entry.tmdb ?? {};
-      return {
-        id: String(entry.id ?? entry.tmdbId),
-        tmdbId: entry.tmdbId,
-        mediaType: tmdb.mediaType ?? entry.mediaType ?? "movie",
-        title: tmdb.title ?? entry.title ?? "Título desconocido",
-        posterUrl: tmdb.posterUrl ?? entry.posterUrl,
-        overview: tmdb.overview ?? entry.overview,
-        platforms: tmdb.platforms ?? entry.platforms ?? [],
-        trailerUrl: tmdb.trailerUrl ?? entry.trailerUrl,
-      } as FavoriteItem;
-    });
+    const items = response?.favorites?.items ?? [];
+    favorites.value = mapItems(items);
+    total.value = response?.favorites?.total ?? items.length;
   } catch (error: any) {
     const message = error?.data?.message || error?.statusMessage || "No pudimos cargar los favoritos.";
     errorMessage.value = Array.isArray(message) ? message.join(" ") : message;
@@ -251,6 +275,27 @@ const fetchSharedFavorites = async () => {
     isLoading.value = false;
   }
 };
+
+const loadMore = async () => {
+  if (isLoadingMore.value) return;
+  isLoadingMore.value = true;
+
+  try {
+    const response = await $fetch<any>(`/favorites/shared/${userId.value}`, {
+      baseURL: config.public.apiBase,
+      params: { take: TAKE, skip: favorites.value.length },
+    });
+
+    const items = response?.favorites?.items ?? [];
+    favorites.value.push(...mapItems(items));
+  } catch {
+    // silencioso
+  } finally {
+    isLoadingMore.value = false;
+  }
+};
+
+const hasMore = computed(() => favorites.value.length < total.value);
 
 const openApp = () => {
   const deepLink = `recomiendame://shared-favorites/${userId.value}`;
