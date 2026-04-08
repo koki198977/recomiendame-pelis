@@ -16,7 +16,7 @@ export default defineNuxtConfig({
     prerender: {
       failOnError: false,
       routes: ['/reset-password', '/delete-account', '/request-delete-account', '/verify-email'],
-      ignore: ['/auth/verify-email', '/shared-favorites/**']
+      ignore: ['/auth/verify-email', '/shared-favorites/**', '/shared-wishlist/**']
     }
   },
   app: {
